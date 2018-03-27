@@ -12,6 +12,7 @@ const {
 
 module.exports = (baseUrl) => {
   const express = require('express');
+  const exphbs = require('express-handlebars');
   const http = require('http');
   const session = require('express-session');
   const app = express();
@@ -26,8 +27,46 @@ module.exports = (baseUrl) => {
   });
 
   app.use(session({ secret: 'secret ponies' }));
+  app.use(express.static('client/static'));
+  app.engine(
+    '.hbs',
+    exphbs({
+      defaultLayout: 'main',
+      extname: '.hbs',
+      helpers: {
+        json: (obj) => JSON.stringify(obj, null, 2),
+      },
+      layoutsDir: 'client/views/layouts/',
+      partialsDir: 'client/views/partials/',
+    }),
+  );
+  app.set('view engine', '.hbs');
+  app.set('views', 'client/views/');
 
-  app.use(express.static('client'));
+  app.get('/', (req, res) => {
+    if (req.session.user) {
+      res.redirect('/user');
+    } else {
+      res.redirect('/login');
+    }
+  });
+
+  app.get('/login', (req, res) => {
+    res.render('login');
+  });
+
+  app.get('/logout', (req, res) => {
+    req.session.user = null;
+    res.redirect('/');
+  });
+
+  app.get('/user', (req, res) => {
+    if (req.session.user) {
+      res.render('user', { user: req.session.user });
+    } else {
+      res.redirect('/login');
+    }
+  });
 
   app.get('/login/:provider', (req, res) => {
     let client;
@@ -83,28 +122,6 @@ module.exports = (baseUrl) => {
       .catch(function(err) {
         res.end('Auth error ' + err);
       });
-  });
-
-  app.get('/user', (req, res) => {
-    if (!req.session.user) {
-      res.redirect('/login');
-      return;
-    }
-
-    res.send(
-      `<p>Hello ${req.session.user.name}</p><a href="logout">Log out</a>`,
-    );
-  });
-
-  app.get('/login', (req, res) => {
-    res.send(
-      '<a href="login/google">Google</a> | <a href="login/forgerock">ForgeRock</a>',
-    );
-  });
-
-  app.get('/logout', (req, res) => {
-    req.session.user = null;
-    res.redirect('/');
   });
 
   const server = http.createServer(app);
