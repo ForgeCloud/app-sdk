@@ -14,17 +14,23 @@ The basics are listed below. See [here](https://developers.google.com/identity/p
 
 Configure the following environment variables. Only the key and secret are required.
 
-| Environment Variable     | Default                                       |
-| ------------------------ | --------------------------------------------- |
-| GOOGLE_ISSUER            | https://accounts.google.com                   |
-| GOOGLE_AUTH_ENDPOINT     | https://accounts.google.com/o/oauth2/v2/auth  |
-| GOOGLE_TOKEN_ENDPOINT    | https://www.googleapis.com/oauth2/v4/token    |
-| GOOGLE_USERINFO_ENDPOINT | https://www.googleapis.com/oauth2/v3/userinfo |
-| GOOGLE_JWKS_URI          | https://www.googleapis.com/oauth2/v3/certs    |
-| GOOGLE_KEY               | None                                          |
-| GOOGLE_SECRET            | None                                          |
+| Environment Variable    | Default                                                 |
+| ----------------------- | ------------------------------------------------------- |
+| OAUTH_ISSUER            | http://openam.example.com/openam/oauth2                 |
+| OAUTH_AUTH_ENDPOINT     | http://openam.example.com/openam/oauth2/authorize       |
+| OAUTH_TOKEN_ENDPOINT    | http://openam.example.com/openam/oauth2/access_token    |
+| OAUTH_USERINFO_ENDPOINT | http://openam.example.com/openam/oauth2/userinfo        |
+| OAUTH_JWKS_URI          | http://openam.example.com/openam/oauth2/connect/jwk_uri |
+| OAUTH_KEY               | None                                                    |
+| OAUTH_SECRET            | None                                                    |
 
 Now run `npm start` and view the site in a browser.
+
+Alternatively, use the `start.sh` script to set environment variables before starting the app server. Specify your app ClientID and Key as arguments. E.g.
+
+```bash
+sh start.sh my-client-id my-app-secret
+```
 
 ## Next Steps
 

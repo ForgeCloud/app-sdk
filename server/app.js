@@ -1,13 +1,13 @@
 'use strict';
 
 const {
-  GOOGLE_ISSUER = 'https://accounts.google.com',
-  GOOGLE_AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth',
-  GOOGLE_TOKEN_ENDPOINT = 'https://www.googleapis.com/oauth2/v4/token',
-  GOOGLE_USERINFO_ENDPOINT = 'https://www.googleapis.com/oauth2/v3/userinfo',
-  GOOGLE_JWKS_URI = 'https://www.googleapis.com/oauth2/v3/certs',
-  GOOGLE_KEY,
-  GOOGLE_SECRET,
+  OAUTH_ISSUER = 'http://openam.example.com/openam/oauth2',
+  OAUTH_AUTH_ENDPOINT = 'http://openam.example.com/openam/oauth2/authorize',
+  OAUTH_TOKEN_ENDPOINT = 'http://openam.example.com/openam/oauth2/access_token',
+  OAUTH_USERINFO_ENDPOINT = 'http://openam.example.com/openam/oauth2/userinfo',
+  OAUTH_JWKS_URI = 'http://openam.example.com/openam/oauth2/connect/jwk_uri',
+  OAUTH_KEY,
+  OAUTH_SECRET,
 } = process.env;
 
 module.exports = (baseUrl) => {
@@ -16,15 +16,6 @@ module.exports = (baseUrl) => {
   const http = require('http');
   const session = require('express-session');
   const app = express();
-  const Issuer = require('openid-client').Issuer;
-
-  const googleIssuer = new Issuer({
-    issuer: GOOGLE_ISSUER,
-    authorization_endpoint: GOOGLE_AUTH_ENDPOINT,
-    token_endpoint: GOOGLE_TOKEN_ENDPOINT,
-    userinfo_endpoint: GOOGLE_USERINFO_ENDPOINT,
-    jwks_uri: GOOGLE_JWKS_URI,
-  });
 
   app.use(session({ secret: 'secret ponies' }));
   app.use(express.static('client/static'));
@@ -68,18 +59,8 @@ module.exports = (baseUrl) => {
     }
   });
 
-  app.get('/login/:provider', (req, res) => {
-    let client;
-    try {
-      client = getClient(req.params.provider);
-    } catch (err) {
-      res.end(err.message);
-      return;
-    }
-
-    req.session.provider = req.params.provider;
-
-    const authz = client.authorizationUrl({
+  app.post('/login', (req, res) => {
+    const authz = getClient().authorizationUrl({
       claims: {
         id_token: { email_verified: null },
         userinfo: { sub: null, email: null },
@@ -94,13 +75,7 @@ module.exports = (baseUrl) => {
   app.get('/callback', (req, res) => {
     log('callback params %j', req.query);
 
-    let client;
-    try {
-      client = getClient(req.session.provider);
-    } catch (err) {
-      res.end(err.message);
-      return;
-    }
+    const client = getClient();
 
     client
       .authorizationCallback(baseUrl + 'callback', req.query)
@@ -124,6 +99,13 @@ module.exports = (baseUrl) => {
       });
   });
 
+  log('OAuth client will use:');
+  console.log('OAUTH_ISSUER ............. ' + OAUTH_ISSUER);
+  console.log('OAUTH_AUTH_ENDPOINT ...... ' + OAUTH_AUTH_ENDPOINT);
+  console.log('OAUTH_TOKEN_ENDPOINT ..... ' + OAUTH_TOKEN_ENDPOINT);
+  console.log('OAUTH_USERINFO_ENDPOINT .. ' + OAUTH_USERINFO_ENDPOINT);
+  console.log('OAUTH_JWKS_URI ........... ' + OAUTH_JWKS_URI);
+
   const server = http.createServer(app);
   server.on('error', onError);
 
@@ -140,18 +122,20 @@ module.exports = (baseUrl) => {
     }
   }
 
-  function getClient(provider) {
-    switch (provider) {
-      case 'google':
-        return new googleIssuer.Client({
-          client_id: GOOGLE_KEY,
-          client_secret: GOOGLE_SECRET,
-        });
-      case 'forgerock':
-        throw new Error('ForgeRock is not implemented');
-      default:
-        throw new Error("Unsupported provider '" + provider + "'");
-    }
+  function getClient() {
+    const Issuer = require('openid-client').Issuer;
+    const issuer = new Issuer({
+      issuer: OAUTH_ISSUER,
+      authorization_endpoint: OAUTH_AUTH_ENDPOINT,
+      token_endpoint: OAUTH_TOKEN_ENDPOINT,
+      userinfo_endpoint: OAUTH_USERINFO_ENDPOINT,
+      jwks_uri: OAUTH_JWKS_URI,
+    });
+
+    return new issuer.Client({
+      client_id: OAUTH_KEY,
+      client_secret: OAUTH_SECRET,
+    });
   }
 
   return server;
