@@ -14,15 +14,11 @@ The basics are listed below. See [here](https://developers.google.com/identity/p
 
 Configure the following environment variables. Only the key and secret are required.
 
-| Environment Variable    | Default                                                 |
-| ----------------------- | ------------------------------------------------------- |
-| OAUTH_ISSUER            | http://openam.example.com/openam/oauth2                 |
-| OAUTH_AUTH_ENDPOINT     | http://openam.example.com/openam/oauth2/authorize       |
-| OAUTH_TOKEN_ENDPOINT    | http://openam.example.com/openam/oauth2/access_token    |
-| OAUTH_USERINFO_ENDPOINT | http://openam.example.com/openam/oauth2/userinfo        |
-| OAUTH_JWKS_URI          | http://openam.example.com/openam/oauth2/connect/jwk_uri |
-| OAUTH_KEY               | None                                                    |
-| OAUTH_SECRET            | None                                                    |
+| Environment Variable | Default                                 |
+| -------------------- | --------------------------------------- |
+| OAUTH_ISSUER         | http://openam.example.com/openam/oauth2 |
+| OAUTH_KEY            | None                                    |
+| OAUTH_SECRET         | None                                    |
 
 Now run `npm start` and view the site in a browser.
 
@@ -34,5 +30,4 @@ sh start.sh my-client-id my-app-secret
 
 ## Next Steps
 
-1.  Determine how much we want to dress up the SDK examples.
-1.  Understand AM OAuth configuration and update this project to support AM.
+1.  Test against brand new AM instance.

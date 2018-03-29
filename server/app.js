@@ -1,16 +1,8 @@
 'use strict';
 
-const {
-  OAUTH_ISSUER = 'http://openam.example.com/openam/oauth2',
-  OAUTH_AUTH_ENDPOINT = 'http://openam.example.com/openam/oauth2/authorize',
-  OAUTH_TOKEN_ENDPOINT = 'http://openam.example.com/openam/oauth2/access_token',
-  OAUTH_USERINFO_ENDPOINT = 'http://openam.example.com/openam/oauth2/userinfo',
-  OAUTH_JWKS_URI = 'http://openam.example.com/openam/oauth2/connect/jwk_uri',
-  OAUTH_KEY,
-  OAUTH_SECRET,
-} = process.env;
+const { OAUTH_KEY, OAUTH_SECRET } = process.env;
 
-module.exports = (baseUrl) => {
+module.exports = (baseUrl, issuer) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
   const http = require('http');
@@ -99,13 +91,6 @@ module.exports = (baseUrl) => {
       });
   });
 
-  log('OAuth client will use:');
-  console.log('OAUTH_ISSUER ............. ' + OAUTH_ISSUER);
-  console.log('OAUTH_AUTH_ENDPOINT ...... ' + OAUTH_AUTH_ENDPOINT);
-  console.log('OAUTH_TOKEN_ENDPOINT ..... ' + OAUTH_TOKEN_ENDPOINT);
-  console.log('OAUTH_USERINFO_ENDPOINT .. ' + OAUTH_USERINFO_ENDPOINT);
-  console.log('OAUTH_JWKS_URI ........... ' + OAUTH_JWKS_URI);
-
   const server = http.createServer(app);
   server.on('error', onError);
 
@@ -123,15 +108,6 @@ module.exports = (baseUrl) => {
   }
 
   function getClient() {
-    const Issuer = require('openid-client').Issuer;
-    const issuer = new Issuer({
-      issuer: OAUTH_ISSUER,
-      authorization_endpoint: OAUTH_AUTH_ENDPOINT,
-      token_endpoint: OAUTH_TOKEN_ENDPOINT,
-      userinfo_endpoint: OAUTH_USERINFO_ENDPOINT,
-      jwks_uri: OAUTH_JWKS_URI,
-    });
-
     return new issuer.Client({
       client_id: OAUTH_KEY,
       client_secret: OAUTH_SECRET,

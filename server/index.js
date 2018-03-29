@@ -1,11 +1,25 @@
 'use strict';
 
-const { HOST = 'localhost', PORT = 8100, PROTOCOL = 'http' } = process.env;
+const Issuer = require('openid-client').Issuer;
 
-const appFactory = require('./app');
+const {
+  HOST = 'localhost',
+  OAUTH_ISSUER = 'http://openam.example.com/openam/oauth2',
+  PORT = 8100,
+  PROTOCOL = 'http',
+} = process.env;
 
 const baseUrl = PROTOCOL + '://' + HOST + (PORT !== 80 ? ':' + PORT : '') + '/';
 
-const app = appFactory(baseUrl);
-app.listen(PORT);
-console.log(`Server listening at ${baseUrl}.`);
+const appFactory = require('./app');
+
+Issuer.discover(OAUTH_ISSUER)
+  .then((issuer) => {
+    const app = appFactory(baseUrl, issuer);
+    app.listen(PORT);
+    console.log(`Server listening at ${baseUrl}.`);
+  })
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
