@@ -58,7 +58,7 @@ module.exports = (baseUrl, issuer) => {
         userinfo: { sub: null, email: null },
       },
       redirect_uri: baseUrl + 'callback',
-      scope: 'openid',
+      scope: 'openid profile',
     });
     log(`Redirecting to ${authz}`);
     res.redirect(authz);

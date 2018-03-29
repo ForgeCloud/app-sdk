@@ -2,17 +2,25 @@
 
 ## Overview
 
-This is a sample Node.js application that implements an OAuth flow with Google using [openid-client](https://www.npmjs.com/package/openid-client). We'll eventually use this to demonstrate OAuth with AM when the integration details are available.
+This is a sample Node.js application that authenticates with an OAuth provider using [openid-client](https://www.npmjs.com/package/openid-client).
 
-## Google Setup
+## AM Setup
 
-The basics are listed below. See [here](https://developers.google.com/identity/protocols/OpenIDConnect) for full information. In the [Google Developer Console](https://console.developers.google.com/apis/dashboard):
+**Configure the OAuth Provider**
 
-1.  Create a new set of **OAuth Client ID** credentials for **Web Application**
-1.  Set your **Authorized Redirect URI** to match your desired host and port, and use a path of `/callback` (e.g. http://localhost:8100/callback)
-1.  Complete the form to generate a client key and secret
+1.  Log in to the AM instance and click the **Top Level Realm** card on the Dashboard
+1.  Click **Configure OAuth Provider**, then **Configure OpenID Connect**
+1.  Click the **Create** button in the upper-right corner of the page to accept the default settings
 
-Configure the following environment variables. Only the key and secret are required.
+**Add the OAuth Client**
+
+1.  Select **Applications** > **OAuth 2.0** from the left menu, then click **Add Client**
+1.  Enter the **Client ID** and **Client Secret** you'll use for the sample application
+1.  Enter `http://localhost:8100/callback` for the **Redirection URIs** (adjust the port as necessary)
+1.  Add scopes named "openid" and "profile"
+1.  Click the **Create** button
+
+## Configuration
 
 | Environment Variable | Default                                 |
 | -------------------- | --------------------------------------- |
@@ -20,14 +28,10 @@ Configure the following environment variables. Only the key and secret are requi
 | OAUTH_KEY            | None                                    |
 | OAUTH_SECRET         | None                                    |
 
-Now run `npm start` and view the site in a browser.
+## Running the App
 
-Alternatively, use the `start.sh` script to set environment variables before starting the app server. Specify your app ClientID and Key as arguments. E.g.
+Use the `start.sh` script to set environment variables before starting the app server. Specify your app ClientID and Key as arguments. E.g.
 
 ```bash
 sh start.sh my-client-id my-app-secret
 ```
-
-## Next Steps
-
-1.  Test against brand new AM instance.
