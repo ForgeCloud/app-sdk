@@ -2,7 +2,7 @@
 
 const { OAUTH_KEY, OAUTH_SECRET } = process.env;
 
-module.exports = (baseUrl, issuer) => {
+module.exports = (baseUrl, issuer, scopes, profileEndpoint) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
   const http = require('http');
@@ -45,7 +45,7 @@ module.exports = (baseUrl, issuer) => {
 
   app.get('/user', (req, res) => {
     if (req.session.user) {
-      res.render('user', { user: req.session.user });
+      res.render('user', { raw: req.session.raw, user: req.session.user });
     } else {
       res.redirect('/login');
     }
@@ -58,7 +58,7 @@ module.exports = (baseUrl, issuer) => {
         userinfo: { sub: null, email: null },
       },
       redirect_uri: baseUrl + 'callback',
-      scope: 'openid profile',
+      scope: scopes,
     });
     log(`Redirecting to ${authz}`);
     res.redirect(authz);
@@ -67,26 +67,32 @@ module.exports = (baseUrl, issuer) => {
   app.get('/callback', (req, res) => {
     log('callback params %j', req.query);
 
-    const client = getClient();
-
-    client
+    getClient()
       .authorizationCallback(baseUrl + 'callback', req.query)
-      .then(function(tokenSet) {
-        log('received and validated tokens %j', tokenSet);
-        log('validated id_token claims %j', tokenSet.claims);
+      .then((tokenSet) => {
+        log('Received and validated tokens %j', tokenSet);
+        log('Validated id_token claims %j', tokenSet.claims);
 
-        client
-          .userinfo(tokenSet.access_token)
-          .then(function(user) {
-            req.session.user = user;
-            log('userinfo %j', user);
+        const fetch = require('node-fetch');
+
+        fetch(profileEndpoint, {
+          headers: {
+            access_token: tokenSet.access_token,
+          },
+        })
+          .then((res) => res.text())
+          .then((text) => {
+            var data = JSON.parse(text);
+            req.session.raw = data;
+            req.session.user = data.length ? data[0] : null;
+            log('userinfo %j', req.session.user);
             res.redirect('/user');
           })
-          .catch(function(err) {
+          .catch((err) => {
             res.end('Access error ' + err);
           });
       })
-      .catch(function(err) {
+      .catch((err) => {
         res.end('Auth error ' + err);
       });
   });

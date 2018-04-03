@@ -17,7 +17,7 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 1.  Select **Applications** > **OAuth 2.0** from the left menu, then click **Add Client**
 1.  Enter the **Client ID** and **Client Secret** you'll use for the sample application
 1.  Enter `http://localhost:8100/callback` for the **Redirection URIs** (adjust the port as necessary)
-1.  Add scopes named "openid" and "profile"
+1.  Add a scope named "openid"
 1.  Click the **Create** button
 
 ## Configuration
@@ -25,8 +25,10 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 | Environment Variable | Default                                 |
 | -------------------- | --------------------------------------- |
 | OAUTH_ISSUER         | http://openam.example.com/openam/oauth2 |
+| OAUTH_SCOPES         | "openid"                                |
 | OAUTH_KEY            | None                                    |
 | OAUTH_SECRET         | None                                    |
+| PROFILE_ENDPOINT     | None                                    |
 
 ## Running the App
 
