@@ -1,8 +1,6 @@
 'use strict';
 
-const { OAUTH_KEY, OAUTH_SECRET } = process.env;
-
-module.exports = (baseUrl, issuer, scopes, profileEndpoint) => {
+module.exports = (baseUrl, issuer, scopes, profileEndpoint, key, secret) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
   const http = require('http');
@@ -115,8 +113,8 @@ module.exports = (baseUrl, issuer, scopes, profileEndpoint) => {
 
   function getClient() {
     return new issuer.Client({
-      client_id: OAUTH_KEY,
-      client_secret: OAUTH_SECRET,
+      client_id: key,
+      client_secret: secret,
     });
   }
 
