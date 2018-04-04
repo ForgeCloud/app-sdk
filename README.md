@@ -28,7 +28,6 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 | OAUTH_SCOPES         | "openid"                                |
 | OAUTH_KEY            | None                                    |
 | OAUTH_SECRET         | None                                    |
-| PROFILE_ENDPOINT     | None                                    |
 
 ## Running the App
 
