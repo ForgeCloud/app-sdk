@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = (baseUrl, issuer, scopes, profileEndpoint, key, secret) => {
+module.exports = (baseUrl, issuer, scopes, key, secret) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
   const http = require('http');
@@ -65,28 +65,22 @@ module.exports = (baseUrl, issuer, scopes, profileEndpoint, key, secret) => {
   app.get('/callback', (req, res) => {
     log('callback params %j', req.query);
 
-    getClient()
+    const client = getClient();
+
+    client
       .authorizationCallback(baseUrl + 'callback', req.query)
       .then((tokenSet) => {
         log('Received and validated tokens %j', tokenSet);
         log('Validated id_token claims %j', tokenSet.claims);
 
-        const fetch = require('node-fetch');
-
-        fetch(profileEndpoint, {
-          headers: {
-            access_token: tokenSet.access_token,
-          },
-        })
-          .then((res) => res.text())
-          .then((text) => {
-            var data = JSON.parse(text);
-            req.session.raw = data;
-            req.session.user = data.length ? data[0] : null;
-            log('userinfo %j', req.session.user);
+        client
+          .userinfo(tokenSet.access_token)
+          .then(function(user) {
+            req.session.user = user;
+            log('userinfo %j', user);
             res.redirect('/user');
           })
-          .catch((err) => {
+          .catch(function(err) {
             res.end('Access error ' + err);
           });
       })

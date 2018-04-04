@@ -9,7 +9,6 @@ const {
   OAUTH_SCOPES = 'openid',
   OAUTH_SECRET,
   PORT = 8100,
-  PROFILE_ENDPOINT = '',
   PROTOCOL = 'http',
 } = process.env;
 
@@ -28,7 +27,6 @@ Issuer.discover(OAUTH_ISSUER)
       baseUrl,
       issuer,
       OAUTH_SCOPES,
-      PROFILE_ENDPOINT,
       OAUTH_KEY,
       OAUTH_SECRET,
     );
