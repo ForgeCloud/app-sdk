@@ -1,7 +1,5 @@
 'use strict';
 
-const Issuer = require('openid-client').Issuer;
-
 const {
   HOST = 'localhost',
   OAUTH_ISSUER = 'http://openam.example.com/openam/oauth2',
@@ -17,7 +15,15 @@ if (!OAUTH_KEY || !OAUTH_SECRET) {
   return;
 }
 
+console.log('ISSUER:   ' + OAUTH_ISSUER);
+console.log('SCOPES:   ' + OAUTH_SCOPES);
+console.log('CLIENTID: ' + OAUTH_KEY);
+
 const baseUrl = PROTOCOL + '://' + HOST + (PORT !== 80 ? ':' + PORT : '') + '/';
+
+const Issuer = require('openid-client').Issuer;
+Issuer.defaultHttpOptions.timeout = 10000;
+console.log('HTTP:\n%j', Issuer.defaultHttpOptions);
 
 const appFactory = require('./app');
 
