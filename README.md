@@ -16,15 +16,19 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 
 1.  Select **Applications** > **OAuth 2.0** from the left menu, then click **Add Client**
 1.  Enter the **Client ID** and **Client Secret** you'll use for the sample application
-1.  Enter `http://localhost:8100/callback` for the **Redirection URIs** (adjust the port as necessary)
+1.  Enter `http://localhost:8100/callback` for the **Redirection URIs** \*
 1.  Add desired scopes (e.g. "openid", "profile", etc)
+1.  On the **OpenID Connect** tab, enter `http://localhost:8100/` for the **Post Logout Redirect URIs** \*
 1.  Click the **Create** button
+
+\* Adjust the port number to match your configuration
 
 **Enable Self-Registration (Optional)**
 
 1.  Select **Services** from the left menu, then click **Add a Service**
 1.  Select service type **User Self-Service**
 1.  Enter the **Encryption Key Pair Alias** and **Signing Secret Key Alias** values
+1.  On the **User Registration** tab, disable **Email Verification**
 1.  Refer to the [AM documentation](https://ea.forgerock.com/docs/am/user-self-service-guide/index.html#chap-uss-implementation) for details
 
 ## Configuration

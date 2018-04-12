@@ -37,8 +37,15 @@ module.exports = (baseUrl, issuer, scopes, key, secret) => {
   });
 
   app.get('/logout', (req, res) => {
-    req.session.user = null;
-    res.redirect('/');
+    if (req.session.idToken) {
+      const endSessionUrl = `${issuer.end_session_endpoint}?id_token_hint=${
+        req.session.idToken
+      }&post_logout_redirect_uri=${baseUrl}`;
+      req.session.user = null;
+      res.redirect(endSessionUrl);
+    } else {
+      res.redirect('/');
+    }
   });
 
   app.get('/user', (req, res) => {
@@ -76,6 +83,7 @@ module.exports = (baseUrl, issuer, scopes, key, secret) => {
         client
           .userinfo(tokenSet.access_token)
           .then(function(user) {
+            req.session.idToken = tokenSet.id_token;
             req.session.user = user;
             log('userinfo %j', user);
             res.redirect('/user');
