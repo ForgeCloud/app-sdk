@@ -5,12 +5,9 @@ module.exports = (baseUrl, issuer, scopes, key, secret) => {
   const exphbs = require('express-handlebars');
   const http = require('http');
   const session = require('express-session');
-  const favicon = require('serve-favicon');
-  const path = require('path');
   const app = express();
 
   app.use(session({ secret: 'secret ponies' }));
-  app.use(favicon(path.join(__dirname, '..', 'client', 'static', 'images', 'favicon.ico')));
   app.use(express.static('client/static'));
   app.engine(
     '.hbs',
