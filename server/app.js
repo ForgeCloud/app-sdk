@@ -5,10 +5,12 @@ module.exports = (baseUrl, issuer, scopes, key, secret) => {
   const exphbs = require('express-handlebars');
   const http = require('http');
   const session = require('express-session');
+  const favicon = require('serve-favicon');
   const app = express();
 
   app.use(session({ secret: 'secret ponies' }));
   app.use(express.static('client/static'));
+  app.use(express.static('client/static/images/favicon.ico'));
   app.engine(
     '.hbs',
     exphbs({
