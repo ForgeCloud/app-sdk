@@ -10,11 +10,13 @@
       "name": "Launch Program",
       "program": "${workspaceFolder}/server/index.js",
       "env": {
+        "AM_URL": "http://openam.fr-saas-hog.forgeblocks.com/openam",
+        "HOST": "app.fr-saas-hog.forgeblocks.com",
         "OAUTH_ISSUER":
           "http://openam.fr-saas-hog.forgeblocks.com/openam/oauth2",
-        "OAUTH_KEY": "sample-app",
+        "OAUTH_KEY": "41c6471a26d332c422a4e3ef333767be",
         "OAUTH_SCOPES": "openid profile",
-        "OAUTH_SECRET": "YkwBMhro0vH92qa4puJy"
+        "OAUTH_SECRET": "41c6471a26d332c422a4e3ef333767be"
       }
     }
   ]

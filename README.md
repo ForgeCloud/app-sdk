@@ -35,6 +35,7 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 
 | Environment Variable | Default                                 |
 | -------------------- | --------------------------------------- |
+| HOST                 | app.example.com                         |
 | OAUTH_ISSUER         | http://openam.example.com/openam/oauth2 |
 | OAUTH_SCOPES\*       | "openid"                                |
 | OAUTH_KEY            | None                                    |
