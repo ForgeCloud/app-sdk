@@ -49,9 +49,8 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
         client
           .userinfo(tokenSet.access_token)
           .then(function(user) {
-            req.session.idToken = tokenSet.id_token;
-            req.session.user = user;
             log('userinfo %j', user);
+            req.session.idToken = tokenSet.id_token;
             res.redirect('/');
           })
           .catch(function(err) {
@@ -68,7 +67,7 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
       const endSessionUrl = `${issuer.end_session_endpoint}?id_token_hint=${
         req.session.idToken
       }&post_logout_redirect_uri=${baseUrl}`;
-      req.session.user = null;
+      req.session.idToken = undefined;
       res.redirect(endSessionUrl);
     } else {
       res.redirect('/');
