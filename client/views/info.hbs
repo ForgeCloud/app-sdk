@@ -17,6 +17,7 @@
                 method: 'GET',
                 url: '{{amUrl}}/json/serverinfo/version',
                 xhrFields: {
+                    // This will cause cookie written by AM or hosted page to be included
                     withCredentials: true
                 }
             }).done(function (data) {

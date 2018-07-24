@@ -11,7 +11,7 @@
       "program": "${workspaceFolder}/server/index.js",
       "env": {
         "AM_URL": "http://openam.fr-saas-hog.forgeblocks.com/openam",
-        "HOST": "app.fr-saas-hog.forgeblocks.com",
+        "HOST": "localhost",
         "OAUTH_ISSUER":
           "http://openam.fr-saas-hog.forgeblocks.com/openam/oauth2",
         "OAUTH_KEY": "41c6471a26d332c422a4e3ef333767be",

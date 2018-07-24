@@ -4,11 +4,14 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
   const http = require('http');
+  const path = require('path');
   const session = require('express-session');
   const app = express();
 
+  const clientDir = path.join(__dirname, '../client');
+
   app.use(session({ secret: 'secret ponies' }));
-  app.use(express.static('client/static'));
+  app.use(express.static(path.join(clientDir, 'static')));
   app.engine(
     '.hbs',
     exphbs({
@@ -17,12 +20,12 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
       helpers: {
         json: (obj) => JSON.stringify(obj, null, 2),
       },
-      layoutsDir: 'client/views/layouts/',
-      partialsDir: 'client/views/partials/',
+      layoutsDir: path.join(clientDir, 'views/layouts/'),
+      partialsDir: path.join(clientDir, 'views/partials/'),
     }),
   );
   app.set('view engine', '.hbs');
-  app.set('views', 'client/views/');
+  app.set('views', path.join(clientDir, 'views/'));
 
   app.get('/', async (req, res) => {
     if (!req.session.idToken) {
