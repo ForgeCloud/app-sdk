@@ -1,14 +1,17 @@
 'use strict';
 
-module.exports = (baseUrl, issuer, scopes, key, secret) => {
+module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
   const http = require('http');
+  const path = require('path');
   const session = require('express-session');
   const app = express();
 
+  const clientDir = path.join(__dirname, '../client');
+
   app.use(session({ secret: 'secret ponies' }));
-  app.use(express.static('client/static'));
+  app.use(express.static(path.join(clientDir, 'static')));
   app.engine(
     '.hbs',
     exphbs({
@@ -17,56 +20,19 @@ module.exports = (baseUrl, issuer, scopes, key, secret) => {
       helpers: {
         json: (obj) => JSON.stringify(obj, null, 2),
       },
-      layoutsDir: 'client/views/layouts/',
-      partialsDir: 'client/views/partials/',
+      layoutsDir: path.join(clientDir, 'views/layouts/'),
+      partialsDir: path.join(clientDir, 'views/partials/'),
     }),
   );
   app.set('view engine', '.hbs');
-  app.set('views', 'client/views/');
+  app.set('views', path.join(clientDir, 'views/'));
 
-  app.get('/', (req, res) => {
-    if (req.session.user) {
-      res.redirect('/user');
-    } else {
-      res.redirect('/login');
+  app.get('/', async (req, res) => {
+    if (!req.session.idToken) {
+      return login(res);
     }
-  });
 
-  app.get('/login', (req, res) => {
-    res.render('login');
-  });
-
-  app.get('/logout', (req, res) => {
-    if (req.session.idToken) {
-      const endSessionUrl = `${issuer.end_session_endpoint}?id_token_hint=${
-        req.session.idToken
-      }&post_logout_redirect_uri=${baseUrl}`;
-      req.session.user = null;
-      res.redirect(endSessionUrl);
-    } else {
-      res.redirect('/');
-    }
-  });
-
-  app.get('/user', (req, res) => {
-    if (req.session.user) {
-      res.render('user', { raw: req.session.raw, user: req.session.user });
-    } else {
-      res.redirect('/login');
-    }
-  });
-
-  app.post('/login', (req, res) => {
-    const authz = getClient().authorizationUrl({
-      claims: {
-        id_token: { email_verified: null },
-        userinfo: { sub: null, email: null },
-      },
-      redirect_uri: baseUrl + 'callback',
-      scope: scopes,
-    });
-    log(`Redirecting to ${authz}`);
-    res.redirect(authz);
+    res.render('info', { amUrl });
   });
 
   app.get('/callback', (req, res) => {
@@ -83,10 +49,9 @@ module.exports = (baseUrl, issuer, scopes, key, secret) => {
         client
           .userinfo(tokenSet.access_token)
           .then(function(user) {
-            req.session.idToken = tokenSet.id_token;
-            req.session.user = user;
             log('userinfo %j', user);
-            res.redirect('/user');
+            req.session.idToken = tokenSet.id_token;
+            res.redirect('/');
           })
           .catch(function(err) {
             res.end('Access error ' + err);
@@ -97,8 +62,17 @@ module.exports = (baseUrl, issuer, scopes, key, secret) => {
       });
   });
 
-  const server = http.createServer(app);
-  server.on('error', onError);
+  app.get('/logout', (req, res) => {
+    if (req.session.idToken) {
+      const endSessionUrl = `${issuer.end_session_endpoint}?id_token_hint=${
+        req.session.idToken
+      }&post_logout_redirect_uri=${baseUrl}`;
+      req.session.idToken = undefined;
+      res.redirect(endSessionUrl);
+    } else {
+      res.redirect('/');
+    }
+  });
 
   function onError(error) {
     log(`Error: ${error}`);
@@ -119,6 +93,22 @@ module.exports = (baseUrl, issuer, scopes, key, secret) => {
       client_secret: secret,
     });
   }
+
+  function login(res) {
+    const authz = getClient().authorizationUrl({
+      claims: {
+        id_token: { email_verified: null },
+        userinfo: { sub: null, email: null },
+      },
+      redirect_uri: baseUrl + 'callback',
+      scope: scopes,
+    });
+    log(`Redirecting to ${authz}`);
+    res.redirect(authz);
+  }
+
+  const server = http.createServer(app);
+  server.on('error', onError);
 
   return server;
 };
