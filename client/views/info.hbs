@@ -19,7 +19,6 @@
                 method: 'GET',
                 url: '{{orgGatewayUrl}}/v1/user/me',
                 xhrFields: {
-                    // This will cause cookie written by AM or hosted page to be included
                     withCredentials: false
                 }
             }).done(function (data) {
