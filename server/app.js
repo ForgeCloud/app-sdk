@@ -56,17 +56,6 @@ module.exports = (
         req.session.idToken = tokenSet.id_token;
         res.cookie('access_token', tokenSet.access_token);
         res.redirect('/');
-
-        // client
-        //   .userinfo(tokenSet.access_token)
-        //   .then(function(user) {
-        //     log('userinfo %j', user);
-        //     req.session.idToken = tokenSet.id_token;
-        //     res.redirect('/');
-        //   })
-        //   .catch(function(err) {
-        //     res.end('Access error ' + err);
-        //   });
       })
       .catch((err) => {
         res.end('Auth error ' + err);
