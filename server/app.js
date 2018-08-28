@@ -1,18 +1,12 @@
 'use strict';
 
-module.exports = (
-  baseUrl,
-  amUrl,
-  issuer,
-  scopes,
-  key,
-  secret,
-  orgGatewayUrl,
-) => {
+module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
+  const fetch = require('node-fetch');
   const http = require('http');
   const path = require('path');
+  const resolve = require('url').resolve;
   const session = require('express-session');
   const app = express();
 
@@ -36,11 +30,17 @@ module.exports = (
   app.set('views', path.join(clientDir, 'views/'));
 
   app.get('/', async (req, res) => {
-    if (!req.session.idToken) {
+    if (!req.session.accessToken) {
       return login(res);
     }
 
-    res.render('info', { orgGatewayUrl });
+    getSelf(req.session.accessToken)
+      .then((user) => {
+        res.render('info', { data: user });
+      })
+      .catch((reason) => {
+        res.render('info', { data: reason });
+      });
   });
 
   app.get('/callback', (req, res) => {
@@ -53,8 +53,9 @@ module.exports = (
       .then((tokenSet) => {
         log('Received and validated tokens %j', tokenSet);
         log('Validated id_token claims %j', tokenSet.claims);
+
+        req.session.accessToken = tokenSet.access_token;
         req.session.idToken = tokenSet.id_token;
-        res.cookie('access_token', tokenSet.access_token);
         res.redirect('/');
       })
       .catch((err) => {
@@ -95,7 +96,6 @@ module.exports = (
   }
 
   function login(res) {
-    res.clearCookie('access_token');
     const authz = getClient().authorizationUrl({
       claims: {
         id_token: { email_verified: null },
@@ -106,6 +106,21 @@ module.exports = (
     });
     log(`Redirecting to ${authz}`);
     res.redirect(authz);
+  }
+
+  async function getSelf(token) {
+    const url = resolve(gatewayUrl, '/v1/user/me');
+    console.log(`Getting profile: ${url} ${token}`);
+    const res = await fetch(url, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    if (res.headers['Content-Type'] === 'application/json') {
+      return await res.json();
+    } else {
+      return await res.text();
+    }
   }
 
   const server = http.createServer(app);
