@@ -1,6 +1,14 @@
 'use strict';
 
-module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
+module.exports = (
+  baseUrl,
+  amUrl,
+  issuer,
+  scopes,
+  key,
+  secret,
+  orgGatewayUrl,
+) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
   const http = require('http');
@@ -32,7 +40,7 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
       return login(res);
     }
 
-    res.render('info', { amUrl });
+    res.render('info', { orgGatewayUrl });
   });
 
   app.get('/callback', (req, res) => {
@@ -45,17 +53,9 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
       .then((tokenSet) => {
         log('Received and validated tokens %j', tokenSet);
         log('Validated id_token claims %j', tokenSet.claims);
-
-        client
-          .userinfo(tokenSet.access_token)
-          .then(function(user) {
-            log('userinfo %j', user);
-            req.session.idToken = tokenSet.id_token;
-            res.redirect('/');
-          })
-          .catch(function(err) {
-            res.end('Access error ' + err);
-          });
+        req.session.idToken = tokenSet.id_token;
+        res.cookie('access_token', tokenSet.access_token);
+        res.redirect('/');
       })
       .catch((err) => {
         res.end('Auth error ' + err);
@@ -95,6 +95,7 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
   }
 
   function login(res) {
+    res.clearCookie('access_token');
     const authz = getClient().authorizationUrl({
       claims: {
         id_token: { email_verified: null },

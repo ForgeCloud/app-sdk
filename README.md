@@ -40,6 +40,7 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 | OAUTH_SCOPES\*       | "openid"                                |
 | OAUTH_KEY            | None                                    |
 | OAUTH_SECRET         | None                                    |
+| ORG_GATEWAY_URL      | http://localhost:8086                   |
 
 \* Scopes should be specified as space-delimited values matching what's configured in AM for your client
 

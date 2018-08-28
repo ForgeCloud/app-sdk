@@ -4,7 +4,8 @@
 </div>
 <p id="loader">Loading...</p>
 <pre id="data"></pre>
-<a href="./logout" class="btn btn-lg btn-block btn-uppercase btn-primary">Sign Out</a>
+<a href="./logout"
+    class="btn btn-lg btn-block btn-uppercase btn-primary">Sign Out</a>
 
 <script type="text/javascript">
     $(function () {
@@ -12,13 +13,13 @@
             $.ajax({
                 headers: {
                     Accept: 'application/json',
-                    'Accept-API-Version': 'resource=1.0',
+                    //'Accept-API-Version': 'resource=1.0',
+                    'Authorization': `Bearer ${$.cookie('access_token')}`,
                 },
                 method: 'GET',
-                url: '{{amUrl}}/json/serverinfo/version',
+                url: '{{orgGatewayUrl}}/v1/user/me',
                 xhrFields: {
-                    // This will cause cookie written by AM or hosted page to be included
-                    withCredentials: true
+                    withCredentials: false
                 }
             }).done(function (data) {
                 $('#data').text(JSON.stringify(data, null, 2));
