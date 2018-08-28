@@ -1,10 +1,12 @@
 'use strict';
 
-module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
+module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
+  const fetch = require('node-fetch');
   const http = require('http');
   const path = require('path');
+  const resolve = require('url').resolve;
   const session = require('express-session');
   const app = express();
 
@@ -28,11 +30,17 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
   app.set('views', path.join(clientDir, 'views/'));
 
   app.get('/', async (req, res) => {
-    if (!req.session.idToken) {
+    if (!req.session.accessToken) {
       return login(res);
     }
 
-    res.render('info', { amUrl });
+    getSelf(req.session.accessToken)
+      .then((user) => {
+        res.render('info', { data: user });
+      })
+      .catch((reason) => {
+        res.render('info', { data: reason });
+      });
   });
 
   app.get('/callback', (req, res) => {
@@ -50,6 +58,7 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
           .userinfo(tokenSet.access_token)
           .then(function(user) {
             log('userinfo %j', user);
+            req.session.accessToken = tokenSet.access_token;
             req.session.idToken = tokenSet.id_token;
             res.redirect('/');
           })
@@ -105,6 +114,21 @@ module.exports = (baseUrl, amUrl, issuer, scopes, key, secret) => {
     });
     log(`Redirecting to ${authz}`);
     res.redirect(authz);
+  }
+
+  async function getSelf(token) {
+    const url = resolve(gatewayUrl, '/v1/user/me');
+    console.log(`Getting profile: ${url} ${token}`);
+    const res = await fetch(url, {
+      headers: {
+        Authorization: 'Bearer ' + token,
+      },
+    });
+    if (res.headers['Content-Type'] === 'application/json') {
+      return await res.json();
+    } else {
+      return await res.text();
+    }
   }
 
   const server = http.createServer(app);

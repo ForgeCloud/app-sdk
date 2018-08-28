@@ -1,8 +1,9 @@
-export HOST=app.fr-saas-hog.forgeblocks.com
-export OAUTH_ISSUER=http://openam.fr-saas-hog.forgeblocks.com/openam/oauth2
-export OAUTH_KEY=$1
-export OAUTH_SCOPES="openid profile"
-export OAUTH_SECRET=$2
+export GATEWAY_URL=$1
+export HOST=localhost
+export OAUTH_ISSUER=$2
+export OAUTH_KEY=$3
+export OAUTH_SCOPES="openid profile api.forgecloud.com:user.read"
+export OAUTH_SECRET=$4
 
 echo Starting server
 npm start

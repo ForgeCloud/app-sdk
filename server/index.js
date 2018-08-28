@@ -1,7 +1,7 @@
 'use strict';
 
 const {
-  AM_URL = 'http://openam:80/openam',
+  GATEWAY_URL = 'http://localhost:8086',
   HOST = 'app.example.com',
   OAUTH_ISSUER = 'http://openam.example.com/openam/oauth2',
   OAUTH_KEY,
@@ -38,7 +38,7 @@ Issuer.discover(OAUTH_ISSUER)
 
     const app = appFactory(
       baseUrl,
-      AM_URL,
+      GATEWAY_URL,
       issuer,
       OAUTH_SCOPES,
       OAUTH_KEY,
