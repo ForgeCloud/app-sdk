@@ -104,6 +104,7 @@ module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
   }
 
   function login(res) {
+    res.clearCookie('access_token');
     const authz = getClient().authorizationUrl({
       claims: {
         id_token: { email_verified: null },
