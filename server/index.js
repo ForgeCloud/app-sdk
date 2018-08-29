@@ -7,7 +7,6 @@ const {
   OAUTH_KEY,
   OAUTH_SCOPES = 'openid',
   OAUTH_SECRET,
-  ORG_GATEWAY_URL = 'http://localhost:8086',
   PORT = 9080,
   PROTOCOL = 'http',
 } = process.env;
@@ -21,6 +20,7 @@ console.log('Configuration');
 console.log('ISSUER:       ' + OAUTH_ISSUER);
 console.log('SCOPES:       ' + OAUTH_SCOPES);
 console.log('CLIENTID:     ' + OAUTH_KEY);
+console.log('GATEWAY_URL:  ' + GATEWAY_URL);
 
 const baseUrl = PROTOCOL + '://' + HOST + (PORT !== 80 ? ':' + PORT : '') + '/';
 
@@ -44,7 +44,6 @@ Issuer.discover(OAUTH_ISSUER)
       OAUTH_SCOPES,
       OAUTH_KEY,
       OAUTH_SECRET,
-      ORG_GATEWAY_URL,
     );
     app.listen(PORT);
     console.log(`Server listening at ${baseUrl}.`);
