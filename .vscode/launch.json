@@ -10,13 +10,12 @@
       "name": "Launch Program",
       "program": "${workspaceFolder}/server/index.js",
       "env": {
-        "AM_URL": "http://openam.fr-saas-hog.forgeblocks.com/openam",
+        "GATEWAY_URL": "http://api.YOUR-TENANT-NAME.forgeblocks.com",
         "HOST": "localhost",
-        "OAUTH_ISSUER":
-          "http://openam.fr-saas-hog.forgeblocks.com/openam/oauth2",
-        "OAUTH_KEY": "41c6471a26d332c422a4e3ef333767be",
-        "OAUTH_SCOPES": "openid profile",
-        "OAUTH_SECRET": "41c6471a26d332c422a4e3ef333767be"
+        "OAUTH_ISSUER": "http://openam.YOUR-TENANT-NAME.forgeblocks.com/openam/oauth2",
+        "OAUTH_KEY": "YOUR CLIENT ID",
+        "OAUTH_SCOPES": "openid profile api.forgecloud.com:user.read",
+        "OAUTH_SECRET": "YOUR CLIENT SECRET"
       }
     }
   ]

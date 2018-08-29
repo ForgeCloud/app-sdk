@@ -1,35 +1,6 @@
 {{> success}}
 <div class="page-header">
-    <h1 class="text-center">OpenAM Server Info</h1>
+    <h1 class="text-center">Your Profile</h1>
 </div>
-<p id="loader">Loading...</p>
-<pre id="data"></pre>
-<a href="./logout"
-    class="btn btn-lg btn-block btn-uppercase btn-primary">Sign Out</a>
-
-<script type="text/javascript">
-    $(function () {
-        try {
-            $.ajax({
-                headers: {
-                    Accept: 'application/json',
-                    //'Accept-API-Version': 'resource=1.0',
-                    'Authorization': `Bearer ${$.cookie('access_token')}`,
-                },
-                method: 'GET',
-                url: '{{orgGatewayUrl}}/v1/user/me',
-                xhrFields: {
-                    withCredentials: false
-                }
-            }).done(function (data) {
-                $('#data').text(JSON.stringify(data, null, 2));
-            }).fail(function (xhr) {
-                alert('Failed to load server information: ' + xhr);
-            }).always(function () {
-                $('#loader').hide();
-            });
-        } catch (e) {
-            alert('Failed to load server information: ' + (e.message || e.toString()));
-        }
-    });
-</script>
+<pre id="data">{{json data}}</pre>
+<a href="./logout" class="btn btn-lg btn-block btn-uppercase btn-primary">Sign Out</a>

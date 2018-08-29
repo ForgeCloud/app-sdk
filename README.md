@@ -16,9 +16,9 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 
 1.  Select **Applications** > **OAuth 2.0** from the left menu, then click **Add Client**
 1.  Enter the **Client ID** and **Client Secret** you'll use for the sample application
-1.  Enter `http://localhost:8100/callback` for the **Redirection URIs** \*
+1.  Enter `http://localhost:9080/callback` for the **Redirection URIs** \*
 1.  Add desired scopes (e.g. "openid", "profile", etc)
-1.  On the **OpenID Connect** tab, enter `http://localhost:8100/` for the **Post Logout Redirect URIs** \*
+1.  On the **OpenID Connect** tab, enter `http://localhost:9080/` for the **Post Logout Redirect URIs** \*
 1.  Click the **Create** button
 
 \* Adjust the port number to match your configuration
@@ -33,14 +33,14 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 
 ## Configuration
 
-| Environment Variable | Default                                 |
-| -------------------- | --------------------------------------- |
-| HOST                 | app.example.com                         |
-| OAUTH_ISSUER         | http://openam.example.com/openam/oauth2 |
-| OAUTH_SCOPES\*       | "openid"                                |
-| OAUTH_KEY            | None                                    |
-| OAUTH_SECRET         | None                                    |
-| ORG_GATEWAY_URL      | http://localhost:8086                   |
+| Environment Variable | Default                                     |
+| -------------------- | ------------------------------------------- |
+| GATEWAY_URL          | http://localhost:8086                       |
+| HOST                 | app.example.com                             |
+| OAUTH_ISSUER         | http://openam.example.com/openam/oauth2     |
+| OAUTH_SCOPES\*       | openid profile api.forgecloud.com:user.read |
+| OAUTH_KEY            | None                                        |
+| OAUTH_SECRET         | None                                        |
 
 \* Scopes should be specified as space-delimited values matching what's configured in AM for your client
 
@@ -52,8 +52,8 @@ When you initially set up the app, first install dependencies via npm.
 npm i
 ```
 
-Use the `start.sh` script to set environment variables before starting the app server. Specify your app Client ID and Key as arguments. E.g.
+Use the `start.sh` script to set environment variables before starting the app server.
 
 ```bash
-sh start.sh my-client-id my-app-secret
+sh ./start.sh {GATEWAY_URL} {OAUTH URL} {APP ID} {APP SECRET}
 ```
