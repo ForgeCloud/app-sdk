@@ -1,9 +1,10 @@
-export GATEWAY_URL=$1
+export TENANT=$1
+export GATEWAY_URL=http://api.$1.forgeblocks.com
 export HOST=localhost
-export OAUTH_ISSUER=$2
-export OAUTH_KEY=$3
+export OAUTH_ISSUER=http://openam.$1.forgeblocks.com/openam/oauth2
+export OAUTH_KEY=$2
 export OAUTH_SCOPES="openid profile api.forgecloud.com:user.read"
-export OAUTH_SECRET=$4
+export OAUTH_SECRET=$3
 
-echo Starting server
+echo Starting sample application...
 npm start
