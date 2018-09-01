@@ -111,13 +111,14 @@ module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
 
   async function getSelf(token) {
     const url = resolve(gatewayUrl, '/v1/user/me');
-    console.log(`Getting profile: ${url} ${token}`);
+
     const res = await fetch(url, {
       headers: {
         Authorization: 'Bearer ' + token,
       },
     });
-    if (res.headers['Content-Type'] === 'application/json') {
+
+    if (res.headers.get('Content-Type').startsWith('application/json')) {
       return await res.json();
     } else {
       return await res.text();
