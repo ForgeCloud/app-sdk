@@ -93,6 +93,7 @@ module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
     return new issuer.Client({
       client_id: key,
       client_secret: secret,
+      id_token_signed_response_alg: 'HS256',
     });
   }
 
