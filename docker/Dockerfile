@@ -1,8 +1,6 @@
 FROM node:latest as builder
 ARG nodeEnv
 ARG port
-ARG BASE_DOMAIN
 WORKDIR /app
 ENV NODE_ENV=$nodeEnv
 ENV PORT=$port
-ENV BASE_DOMAIN=$BASE_DOMAIN
