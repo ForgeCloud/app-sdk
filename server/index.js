@@ -3,7 +3,7 @@
 const {
   GATEWAY_URL = 'http://localhost:8086',
   HOST = 'app.example.com',
-  OAUTH_ISSUER = 'http://openam.example.com/openam/oauth2',
+  OAUTH_ISSUER = 'https://openam-example.com/openam/oauth2',
   OAUTH_KEY,
   OAUTH_SCOPES = 'openid',
   OAUTH_SECRET,
