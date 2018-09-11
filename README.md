@@ -9,6 +9,7 @@ This is a sample Node.js application that authenticates with an OAuth provider u
 First, create a web app in your ForgeRock SaaS adminstration UI (or via the API). Set the following configuration:
 
 - Login Redirect URL Whitelist: `http://localhost:9080/callback`
+- Logout Redirect URL Whitelist: `http://localhost:9080/
 
 Click the **Create Application** button. **Be sure to capture the generated secret,** since it is unrecoverable and will not be shown again.
 
