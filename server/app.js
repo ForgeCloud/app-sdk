@@ -90,11 +90,13 @@ module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
   }
 
   function getClient() {
-    return new issuer.Client({
+    const client = new issuer.Client({
       client_id: key,
       client_secret: secret,
       id_token_signed_response_alg: 'HS256',
     });
+    client.CLOCK_TOLERANCE = 5;
+    return client;
   }
 
   function login(res) {
