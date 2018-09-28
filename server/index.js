@@ -1,7 +1,7 @@
 'use strict';
 
 const {
-  GATEWAY_URL = 'http://localhost:8086',
+  ORG_GATEWAY_URL = 'http://localhost:8086',
   HOST = 'app.example.com',
   OAUTH_ISSUER = 'https://openam-example.com/openam/oauth2',
   OAUTH_KEY,
@@ -20,7 +20,7 @@ console.log('Configuration');
 console.log('ISSUER:       ' + OAUTH_ISSUER);
 console.log('SCOPES:       ' + OAUTH_SCOPES);
 console.log('CLIENTID:     ' + OAUTH_KEY);
-console.log('GATEWAY_URL:  ' + GATEWAY_URL);
+console.log('ORG_GATEWAY_URL:  ' + ORG_GATEWAY_URL);
 
 const baseUrl = PROTOCOL + '://' + HOST + (PORT !== 80 ? ':' + PORT : '') + '/';
 
@@ -39,7 +39,7 @@ Issuer.discover(OAUTH_ISSUER)
 
     const app = appFactory(
       baseUrl,
-      GATEWAY_URL,
+      ORG_GATEWAY_URL,
       issuer,
       OAUTH_SCOPES,
       OAUTH_KEY,
