@@ -24,7 +24,7 @@ sh start.sh {tenant name} {client id} {secret}
 
 | Environment Variable | Default                                     |
 | -------------------- | ------------------------------------------- |
-| GATEWAY_URL          | http://localhost:8086                       |
+| ORG_GATEWAY_URL          | http://localhost:8086                       |
 | HOST                 | app.example.com                             |
 | OAUTH_ISSUER         | https://openam-example.com/openam/oauth2    |
 | OAUTH_SCOPES         | openid profile api.forgecloud.com:user.read |

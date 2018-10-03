@@ -1,5 +1,5 @@
 export TENANT=$1
-export GATEWAY_URL=https://api-$1.forgeblocks.com
+export ORG_GATEWAY_URL=https://api-$1.forgeblocks.com
 export HOST=localhost
 export OAUTH_ISSUER=https://openam-$1.forgeblocks.com/openam/oauth2
 export OAUTH_KEY=$2

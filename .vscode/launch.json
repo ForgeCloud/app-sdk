@@ -10,7 +10,7 @@
       "name": "Launch Program",
       "program": "${workspaceFolder}/server/index.js",
       "env": {
-        "GATEWAY_URL": "http://api.YOUR-TENANT-NAME.forgeblocks.com",
+        "ORG_GATEWAY_URL": "http://api.YOUR-TENANT-NAME.forgeblocks.com",
         "HOST": "localhost",
         "OAUTH_ISSUER": "http://openam.YOUR-TENANT-NAME.forgeblocks.com/openam/oauth2",
         "OAUTH_KEY": "YOUR CLIENT ID",
