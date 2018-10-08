@@ -113,7 +113,7 @@ module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
   }
 
   async function getSelf(token) {
-    const url = resolve(gatewayUrl, '/v1/user/me');
+    const url = resolve(gatewayUrl, '/v1/me');
 
     const res = await fetch(url, {
       headers: {
