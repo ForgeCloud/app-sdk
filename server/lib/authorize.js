@@ -27,14 +27,14 @@ module.exports = (oidcClient) => {
   }
 
   function nonHosted(tokenId) {
-    const authz = oidcClient.authorizationUrl({
+    const authUrl = oidcClient.authorizationUrl({
       redirect_uri: CALLBACK_NON_HOSTED,
       scope: OAUTH_SCOPES,
       decision: 'allow',
       csrf: tokenId,
     });
 
-    return fetch(authz, {
+    return fetch(authUrl, {
       method: 'POST',
       credentials: 'same-origin',
       headers: {
