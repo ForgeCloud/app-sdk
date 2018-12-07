@@ -1,0 +1,25 @@
+version: '3.5'
+volumes:
+  node_modules:
+services:
+  app-sdk:
+    command: ./docker/run.sh
+    container_name: app-sdk
+    build:
+      context: ./
+      dockerfile: docker/Dockerfile
+    image: forgecloud/app-sdk:local
+    ports:
+      - '9080:9080'
+    environment:
+      TENANT: ${TENANT}
+      ORG_GATEWAY_URL: https://api-${TENANT}.forgeblocks.com
+      HOST: localhost
+      OAUTH_ISSUER: https://openam-${TENANT}.forgeblocks.com/openam/oauth2
+      OAUTH_KEY: ${OAUTH_KEY}
+      OAUTH_SCOPES: 'openid profile api.forgecloud.com:user.read'
+      OAUTH_SECRET: ${OAUTH_SECRET}
+      PORT: 9080
+    volumes:
+      - .:/app-sdk
+      - node_modules:/app-sdk/node_modules
