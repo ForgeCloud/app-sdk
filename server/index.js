@@ -1,15 +1,14 @@
 'use strict';
 
 const {
-  ORG_GATEWAY_URL = 'http://localhost:8086',
-  HOST = 'app.example.com',
-  OAUTH_ISSUER = 'https://openam-example.com/openam/oauth2',
+  BASE_URL,
+  ORG_GATEWAY_URL,
+  OAUTH_ISSUER,
   OAUTH_KEY,
-  OAUTH_SCOPES = 'openid',
+  OAUTH_SCOPES,
   OAUTH_SECRET,
-  PORT = 9080,
-  PROTOCOL = 'http',
-} = process.env;
+  PORT,
+} = require('./config');
 
 if (!OAUTH_KEY || !OAUTH_SECRET) {
   console.error('OAuth key and secret are required.');
@@ -21,8 +20,6 @@ console.log('ISSUER:       ' + OAUTH_ISSUER);
 console.log('SCOPES:       ' + OAUTH_SCOPES);
 console.log('CLIENTID:     ' + OAUTH_KEY);
 console.log('ORG_GATEWAY_URL:  ' + ORG_GATEWAY_URL);
-
-const baseUrl = PROTOCOL + '://' + HOST + (PORT !== 80 ? ':' + PORT : '') + '/';
 
 const Issuer = require('openid-client').Issuer;
 Issuer.defaultHttpOptions.timeout = 10000;
@@ -37,16 +34,9 @@ Issuer.discover(OAUTH_ISSUER)
     console.log('TOKEN:        ' + issuer.token_endpoint);
     console.log('USER_INFO:    ' + issuer.userinfo_endpoint);
 
-    const app = appFactory(
-      baseUrl,
-      ORG_GATEWAY_URL,
-      issuer,
-      OAUTH_SCOPES,
-      OAUTH_KEY,
-      OAUTH_SECRET,
-    );
+    const app = appFactory(issuer);
     app.listen(PORT);
-    console.log(`Server listening at ${baseUrl}.`);
+    console.log(`Server listening at ${BASE_URL}.`);
   })
   .catch((err) => {
     console.error(err);

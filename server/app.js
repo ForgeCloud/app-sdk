@@ -1,6 +1,15 @@
 'use strict';
 
-module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
+const authenticate = require('./lib/authenticate');
+
+const {
+  BASE_URL,
+  CALLBACK_HOSTED,
+  CALLBACK_NON_HOSTED,
+  ORG_GATEWAY_URL,
+} = require('./config');
+
+module.exports = (issuer) => {
   const express = require('express');
   const exphbs = require('express-handlebars');
   const fetch = require('node-fetch');
@@ -8,12 +17,15 @@ module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
   const path = require('path');
   const resolve = require('url').resolve;
   const session = require('express-session');
+  const bodyParser = require('body-parser');
   const app = express();
 
-  const clientDir = path.join(__dirname, '../client');
+  const staticDir = path.join(__dirname, '../client');
+  const oidcClient = require('./lib/client')(issuer);
+  const authorize = require('./lib/authorize')(oidcClient);
 
   app.use(session({ secret: 'secret ponies' }));
-  app.use(express.static(path.join(clientDir, 'static')));
+  app.use(express.static(path.join(staticDir, 'static')));
   app.engine(
     '.hbs',
     exphbs({
@@ -22,99 +34,117 @@ module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
       helpers: {
         json: (obj) => JSON.stringify(obj, null, 2),
       },
-      layoutsDir: path.join(clientDir, 'views/layouts/'),
-      partialsDir: path.join(clientDir, 'views/partials/'),
+      layoutsDir: path.join(staticDir, 'views/layouts/'),
+      partialsDir: path.join(staticDir, 'views/partials/'),
     }),
   );
   app.set('view engine', '.hbs');
-  app.set('views', path.join(clientDir, 'views/'));
+  app.set('views', path.join(staticDir, 'views/'));
+  app.use(bodyParser.urlencoded({ extended: false }));
 
-  app.get('/', async (req, res) => {
+  app.get('/', indexPage);
+  app.get('/signin', signinPage);
+  app.get('/signin-non-hosted', nonHostedSigninPage);
+
+  app.get('/callback', hostedCallbackHandler);
+  app.get('/callback/non-hosted', nonHostedCallbackHandler);
+  app.get('/logout', logoutHandler);
+  app.post('/signin-hosted', hostedSigninHandler);
+  app.post('/signin-non-hosted', nonHostedSigningHandler);
+
+  async function indexPage(req, res) {
     if (!req.session.accessToken) {
-      return login(res);
+      return res.redirect('/signin');
     }
+    try {
+      let user = await getUserInfo(req.session.accessToken);
+      res.render('info', { data: user });
+    } catch (err) {
+      res.render('info', { data: err });
+    }
+  }
 
-    getSelf(req.session.accessToken)
-      .then((user) => {
-        res.render('info', { data: user });
-      })
-      .catch((reason) => {
-        res.render('info', { data: reason });
-      });
-  });
+  function nonHostedSigninPage(req, res) {
+    res.render('signin/non-hosted', {});
+  }
 
-  app.get('/callback', (req, res) => {
+  function nonHostedCallbackHandler(req, res) {
+    res.json(req.query);
+  }
+
+  function signinPage(req, res) {
+    res.render('signin/index', {});
+  }
+
+  async function hostedCallbackHandler(req, res) {
     log('callback params %j', req.query);
+    try {
+      const { access_token, id_token } = await authorize.callback(
+        CALLBACK_HOSTED,
+        req.query,
+      );
+      setTokensAndRedirect(req, res, access_token, id_token);
+    } catch (err) {
+      res.end('Auth error ' + err);
+    }
+  }
 
-    const client = getClient();
-
-    client
-      .authorizationCallback(baseUrl + 'callback', req.query)
-      .then((tokenSet) => {
-        log('Received and validated tokens %j', tokenSet);
-        log('Validated id_token claims %j', tokenSet.claims);
-
-        req.session.accessToken = tokenSet.access_token;
-        req.session.idToken = tokenSet.id_token;
-        res.redirect('/');
-      })
-      .catch((err) => {
-        res.end('Auth error ' + err);
-      });
-  });
-
-  app.get('/logout', (req, res) => {
+  function logoutHandler(req, res) {
     if (req.session.idToken) {
       const endSessionUrl = `${issuer.end_session_endpoint}?id_token_hint=${
         req.session.idToken
-      }&post_logout_redirect_uri=${baseUrl}`;
+      }&post_logout_redirect_uri=${BASE_URL}`;
       req.session.accessToken = undefined;
       req.session.idToken = undefined;
       res.redirect(endSessionUrl);
     } else {
       res.redirect('/');
     }
-  });
-
-  function onError(error) {
-    log(`Error: ${error}`);
   }
 
-  function log(msg, options) {
-    console.log('=============================');
-    if (options) {
-      console.log(msg, options);
-    } else {
-      console.log(msg);
+  async function nonHostedSigningHandler(req, res) {
+    let { password, username } = req.body;
+    username = typeof username == 'string' ? username.trim() : undefined;
+    password = typeof password == 'string' ? password.trim() : undefined;
+    if (!username || !password) {
+      console.log(username, password);
+      return res.render('signin/non-hosted', {
+        err: {
+          status: 400,
+          reason: 'Bad Request',
+          help: 'username & password are required',
+        },
+        username,
+        password,
+      });
+    }
+    try {
+      const { tokenId } = await authenticate(username, password);
+      const authPayload = await authorize.nonHosted(tokenId);
+      const { access_token, id_token } = await authorize.callback(
+        CALLBACK_NON_HOSTED,
+        authPayload,
+      );
+      setTokensAndRedirect(req, res, access_token, id_token);
+    } catch (err) {
+      // res.status(err.status || 500).json(err);
+      switch (err.reason) {
+        case 'Bad Request':
+          err.help = 'Ensure your login redirect urls are configured properly';
+          err.docs =
+            'https://github.com/ForgeCloud/app-sdk/tree/810-authcode#redirect_uris';
+          break;
+      }
+      res.render('signin/non-hosted', { err: err, username, password });
     }
   }
 
-  function getClient() {
-    const client = new issuer.Client({
-      client_id: key,
-      client_secret: secret,
-      id_token_signed_response_alg: 'HS256',
-    });
-    client.CLOCK_TOLERANCE = 5;
-    return client;
+  function hostedSigninHandler(req, res) {
+    authorize.hosted(res);
   }
 
-  function login(res) {
-    const authz = getClient().authorizationUrl({
-      claims: {
-        id_token: { email_verified: null },
-        userinfo: { sub: null, email: null },
-      },
-      redirect_uri: baseUrl + 'callback',
-      scope: scopes,
-    });
-    log(`Redirecting to ${authz}`);
-    res.redirect(authz);
-  }
-
-  async function getSelf(token) {
-    const url = resolve(gatewayUrl, '/v1/me');
-
+  async function getUserInfo(token) {
+    const url = resolve(ORG_GATEWAY_URL, '/v1/me');
     const res = await fetch(url, {
       headers: {
         Authorization: 'Bearer ' + token,
@@ -125,6 +155,27 @@ module.exports = (baseUrl, gatewayUrl, issuer, scopes, key, secret) => {
       return await res.json();
     } else {
       return await res.text();
+    }
+  }
+
+  function setTokensAndRedirect(req, res, access_token, id_token) {
+    log('access_token: %j', access_token);
+    log('id_token: %j', id_token);
+    req.session.accessToken = access_token;
+    req.session.idToken = id_token;
+    res.redirect('/');
+  }
+
+  function onError(error) {
+    console.log(`Error: ${error}`);
+  }
+
+  function log(msg, options) {
+    console.log('=============================');
+    if (options) {
+      console.log(msg, options);
+    } else {
+      console.log(msg);
     }
   }
 
