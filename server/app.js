@@ -107,7 +107,6 @@ module.exports = (issuer) => {
     username = typeof username == 'string' ? username.trim() : undefined;
     password = typeof password == 'string' ? password.trim() : undefined;
     if (!username || !password) {
-      console.log(username, password);
       return res.render('signin/non-hosted', {
         err: {
           status: 400,
