@@ -15,7 +15,7 @@ services:
       TENANT: ${TENANT}
       ORG_GATEWAY_URL: https://api-${TENANT}.forgeblocks.com
       HOST: localhost
-      OAUTH_ISSUER: https://openam-${TENANT}.forgeblocks.com/openam/oauth2
+      OAUTH_ISSUER: https://openam-${TENANT}.forgeblocks.com/oauth2
       OAUTH_KEY: ${OAUTH_KEY}
       OAUTH_SCOPES: 'openid profile api.forgecloud.com:user.read'
       OAUTH_SECRET: ${OAUTH_SECRET}

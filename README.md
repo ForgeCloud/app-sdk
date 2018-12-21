@@ -69,7 +69,7 @@ curl -X POST \
 {
     "code": "rgH$6sWUe81nFD$4hudYiMifQ",
     "scope": "profile",
-    "iss": "https://openam-<YOUR_TENANT>.forgeblocks.com/openam/oauth2",
+    "iss": "https://openam-<YOUR_TENANT>.forgeblocks.com/oauth2",
     "client_id": "<YOUR_CLIENT_ID>"
 }
 ```
@@ -80,7 +80,7 @@ curl -X POST \
 | -------------------- | ------------------------------------------- |
 | ORG_GATEWAY_URL      | http://localhost:8086                       |
 | HOST                 | app.example.com                             |
-| OAUTH_ISSUER         | https://openam-example.com/openam/oauth2    |
+| OAUTH_ISSUER         | https://openam-example.com/oauth2           |
 | OAUTH_SCOPES         | openid profile api.forgecloud.com:user.read |
 | OAUTH_KEY            | None                                        |
 | OAUTH_SECRET         | None                                        |

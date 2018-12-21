@@ -12,7 +12,7 @@
       "env": {
         "ORG_GATEWAY_URL": "http://api.YOUR-TENANT-NAME.forgeblocks.com",
         "HOST": "localhost",
-        "OAUTH_ISSUER": "http://openam.YOUR-TENANT-NAME.forgeblocks.com/openam/oauth2",
+        "OAUTH_ISSUER": "http://openam.YOUR-TENANT-NAME.forgeblocks.com/oauth2",
         "OAUTH_KEY": "YOUR CLIENT ID",
         "OAUTH_SCOPES": "openid profile api.forgecloud.com:user.read",
         "OAUTH_SECRET": "YOUR CLIENT SECRET"
