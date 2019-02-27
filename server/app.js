@@ -58,6 +58,7 @@ module.exports = (issuer) => {
     }
     try {
       let user = await getUserInfo(req.session.accessToken);
+      console.log('user:', user);
       res.render('info', { data: user });
     } catch (err) {
       res.render('info', { data: err });
