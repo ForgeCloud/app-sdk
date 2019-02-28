@@ -17,7 +17,7 @@ services:
       HOST: localhost
       OAUTH_ISSUER: https://openam-${TENANT}.forgeblocks.com/oauth2
       OAUTH_KEY: ${OAUTH_KEY}
-      OAUTH_SCOPES: 'openid profile api.forgecloud.com:user.read'
+      OAUTH_SCOPES: 'openid me.read'
       OAUTH_SECRET: ${OAUTH_SECRET}
       PORT: 9080
     volumes:
