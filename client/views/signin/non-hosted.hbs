@@ -1,31 +1,49 @@
 {{> logo}}
 <header>
-    <h1 class="text-center">Non-Hosted Sign In</h1>
+  <h1 class="text-center">Non-Hosted Sign In</h1>
 </header>
 
 <form method="post" action="/signin-non-hosted">
-    <fieldset>
-        <label>Username</label>
-        <input 
-            name="username"
-            type="text" 
-            pattern=".{1,}"
-            class="input-text fullwidth"
-            value="{{username}}" 
-            placeholder=""
-            required />
-    </fieldset>
-    <fieldset>
-        <label>Password</label>
-        <input 
-            name="password"
-            type="password" 
-            pattern=".{1,}"
-            class="input-text fullwidth"
-            value="{{password}}" 
-            placeholder=""
-            required />
-    </fieldset>
-    <button type="submit">Sign In</button>
+  <fieldset>
+    <label>Username</label>
+    <input
+      name="username"
+      type="text"
+      pattern=".{1,}"
+      class="input-text fullwidth"
+      value="{{username}}"
+      placeholder=""
+      required
+    />
+  </fieldset>
+  <fieldset>
+    <label>Password</label>
+    <input
+      name="password"
+      type="password"
+      pattern=".{1,}"
+      class="input-text fullwidth"
+      value="{{password}}"
+      placeholder=""
+      required
+    />
+  </fieldset>
+  <button type="submit">Sign In</button>
 </form>
+<footer>
+  <p>
+    <span
+      >Forgot password?
+      <a id="forgot-password" href="forgot-password">Retrieve it here</a></span
+    >
+  </p>
+  <p>
+    <span
+      >Forgot username?
+      <a id="recover-username" href="recover-username"
+        >Retrieve it here</a
+      ></span
+    >
+  </p>
+</footer>
 <br />

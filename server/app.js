@@ -1,11 +1,14 @@
 'use strict';
 
-const authenticate = require('./lib/authenticate');
+const { authenticate, getAppAccessToken } = require('./lib/authenticate');
+const btoa = require('btoa');
 
 const {
   BASE_URL,
   CALLBACK_HOSTED,
   CALLBACK_NON_HOSTED,
+  OAUTH_KEY,
+  OAUTH_SECRET,
   ORG_GATEWAY_URL,
 } = require('./config');
 
@@ -45,12 +48,15 @@ module.exports = (issuer) => {
   app.get('/', indexPage);
   app.get('/signin', signinPage);
   app.get('/signin-non-hosted', nonHostedSigninPage);
+  app.get('/forgot-password', forgotPasswordPage);
+  app.get('/recover-username', recoverUsernamePage);
 
   app.get('/callback', hostedCallbackHandler);
   app.get('/callback/non-hosted', nonHostedCallbackHandler);
   app.get('/logout', logoutHandler);
   app.post('/signin-hosted', hostedSigninHandler);
   app.post('/signin-non-hosted', nonHostedSigningHandler);
+  app.post('/forgot-password', forgotPasswordHandler);
 
   async function indexPage(req, res) {
     if (!req.session.accessToken) {
@@ -75,6 +81,14 @@ module.exports = (issuer) => {
 
   function signinPage(req, res) {
     res.render('signin/index', {});
+  }
+
+  function forgotPasswordPage(req, res) {
+    res.render('signin/forgot-password', {});
+  }
+
+  function recoverUsernamePage(req, res) {
+    res.render('signin/recover-username', {});
   }
 
   async function hostedCallbackHandler(req, res) {
@@ -137,6 +151,42 @@ module.exports = (issuer) => {
       }
       res.render('signin/non-hosted', { err: err, username, password });
     }
+  }
+
+  async function forgotPasswordHandler(req, res) {
+    let { username, email } = req.body;
+    username = typeof username == 'string' ? username.trim() : undefined;
+    email = typeof email == 'string' ? email.trim() : undefined;
+    if (!username || !email) {
+      return res.render('signin/forgot-password', {
+        err: {
+          status: 400,
+          reason: 'Bad Request',
+          help: 'username & email are required',
+        },
+        username,
+        email,
+      });
+    }
+
+    const token = await getAppAccessToken(btoa(`${OAUTH_KEY}:${OAUTH_SECRET}`));
+    try {
+      const url = resolve(ORG_GATEWAY_URL, '/v1/users/reset-password');
+      const res = await fetch(url, {
+        body: JSON.stringify({
+          email: email,
+          userName: username,
+        }),
+        headers: {
+          Authorization: 'Bearer ' + token.access_token,
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+    } catch (err) {
+      res.render('signin/forgot-password', { err: err, username, email });
+    }
+    res.render('signin/non-hosted');
   }
 
   function hostedSigninHandler(req, res) {
