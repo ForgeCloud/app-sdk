@@ -57,6 +57,7 @@ module.exports = (issuer) => {
   app.post('/signin-hosted', hostedSigninHandler);
   app.post('/signin-non-hosted', nonHostedSigningHandler);
   app.post('/forgot-password', forgotPasswordHandler);
+  app.post('/recover-username', recoverUsernameHandler);
 
   async function indexPage(req, res) {
     if (!req.session.accessToken) {
@@ -169,7 +170,10 @@ module.exports = (issuer) => {
       });
     }
 
-    const token = await getAppAccessToken(btoa(`${OAUTH_KEY}:${OAUTH_SECRET}`));
+    const token = await getAppAccessToken(
+      'user.reset-password',
+      btoa(`${OAUTH_KEY}:${OAUTH_SECRET}`),
+    );
     try {
       const url = resolve(ORG_GATEWAY_URL, '/v1/users/reset-password');
       const res = await fetch(url, {
@@ -187,6 +191,43 @@ module.exports = (issuer) => {
       res.render('signin/forgot-password', { err: err, username, email });
     }
     res.render('signin/non-hosted');
+  }
+
+  async function recoverUsernameHandler(req, res) {
+    let { email } = req.body;
+    email = typeof email == 'string' ? email.trim() : undefined;
+    if (!email) {
+      return res.render('signin/recover-username', {
+        err: {
+          status: 400,
+          reason: 'Bad Request',
+          help: 'email is required',
+        },
+        username,
+        email,
+      });
+    }
+
+    const token = await getAppAccessToken(
+      'user.recover-username',
+      btoa(`${OAUTH_KEY}:${OAUTH_SECRET}`),
+    );
+    try {
+      const url = resolve(ORG_GATEWAY_URL, '/v1/users/recover-username');
+      const res = await fetch(url, {
+        body: JSON.stringify({
+          email: email,
+        }),
+        headers: {
+          Authorization: 'Bearer ' + token.access_token,
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+    } catch (err) {
+      res.render('signin/recover-username', { err: err, email });
+    }
+    res.render('signin/recover-username');
   }
 
   function hostedSigninHandler(req, res) {
