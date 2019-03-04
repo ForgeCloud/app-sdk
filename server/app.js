@@ -1,12 +1,12 @@
 'use strict';
 
 const { authenticate, getAppAccessToken } = require('./lib/authenticate');
-const btoa = require('btoa');
 
 const {
   BASE_URL,
   CALLBACK_HOSTED,
   CALLBACK_NON_HOSTED,
+  OAUTH_ACCESS_TOKEN,
   OAUTH_KEY,
   OAUTH_SECRET,
   ORG_GATEWAY_URL,
@@ -142,7 +142,6 @@ module.exports = (issuer) => {
       );
       setTokensAndRedirect(req, res, access_token, id_token);
     } catch (err) {
-      // res.status(err.status || 500).json(err);
       switch (err.reason) {
         case 'Bad Request':
           err.help = 'Ensure your login redirect urls are configured properly';
@@ -172,7 +171,7 @@ module.exports = (issuer) => {
 
     const token = await getAppAccessToken(
       'user.reset-password',
-      btoa(`${OAUTH_KEY}:${OAUTH_SECRET}`),
+      OAUTH_ACCESS_TOKEN,
     );
     try {
       const url = resolve(ORG_GATEWAY_URL, '/v1/users/reset-password');
@@ -203,14 +202,13 @@ module.exports = (issuer) => {
           reason: 'Bad Request',
           help: 'email is required',
         },
-        username,
         email,
       });
     }
 
     const token = await getAppAccessToken(
       'user.recover-username',
-      btoa(`${OAUTH_KEY}:${OAUTH_SECRET}`),
+      OAUTH_ACCESS_TOKEN,
     );
     try {
       const url = resolve(ORG_GATEWAY_URL, '/v1/users/recover-username');

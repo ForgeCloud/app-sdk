@@ -30,7 +30,6 @@ function getAppAccessToken(scope, token) {
   const host = OPEN_AM.split('//')[1];
   const params = new URLSearchParams();
   params.append('grant_type', 'client_credentials');
-  // params.append('scope', 'openid user.reset-password');
   params.append('scope', scope);
 
   return fetch(`${OPEN_AM}/oauth2/access_token`, {
@@ -47,7 +46,7 @@ function getAppAccessToken(scope, token) {
     .then(ParseResponse)
     .then(({ payload }) => payload)
     .catch((err) => {
-      console.log('authenticate err:', err);
+      console.log('access token err:', err);
       throw err;
     });
 }
