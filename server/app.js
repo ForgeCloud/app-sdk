@@ -1,14 +1,14 @@
 'use strict';
 
+const btoa = require('btoa');
 const { authenticate, getAppAccessToken } = require('./lib/authenticate');
-
 const {
   BASE_URL,
   CALLBACK_HOSTED,
   CALLBACK_NON_HOSTED,
   OAUTH_ACCESS_TOKEN,
-  OAUTH_KEY,
-  OAUTH_SECRET,
+  CLIENT_ID,
+  CLIENT_SECRET,
   ORG_GATEWAY_URL,
 } = require('./config');
 
@@ -168,10 +168,11 @@ module.exports = (issuer) => {
       });
     }
 
+    const clientCredentials = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
     const resp = {};
     const token = await getAppAccessToken(
       'user.reset-password',
-      OAUTH_ACCESS_TOKEN,
+      clientCredentials,
     );
     try {
       const url = resolve(ORG_GATEWAY_URL, '/v1/users/reset-password');
@@ -208,10 +209,11 @@ module.exports = (issuer) => {
       });
     }
 
+    const clientCredentials = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
     const resp = {};
     const token = await getAppAccessToken(
       'user.recover-username',
-      OAUTH_ACCESS_TOKEN,
+      clientCredentials,
     );
     try {
       const url = resolve(ORG_GATEWAY_URL, '/v1/users/recover-username');

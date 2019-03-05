@@ -39,7 +39,7 @@ function getAppAccessToken(scope, token) {
       Authorization: `Basic ${token}`,
       'Content-Type': 'application/x-www-form-urlencoded',
       Host: host,
-      'Set-Cookie': 'iPlanetDirectoryPro=0;session-jwt=0;amlbcookie=0',
+      // 'Set-Cookie': 'iPlanetDirectoryPro=0;session-jwt=0;amlbcookie=0',
     },
     method: 'POST',
   })

@@ -1,12 +1,12 @@
-const { OAUTH_KEY, OAUTH_SECRET } = require('../config');
+const { CLIENT_ID, CLIENT_SECRET } = require('../config');
 
 let client;
 
 module.exports = (issuer) => {
   if (!client) {
     client = new issuer.Client({
-      client_id: OAUTH_KEY,
-      client_secret: OAUTH_SECRET,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
       id_token_signed_response_alg: 'HS256',
     });
     client.CLOCK_TOLERANCE = 5;
