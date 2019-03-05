@@ -65,7 +65,6 @@ module.exports = (issuer) => {
     }
     try {
       let user = await getUserInfo(req.session.accessToken);
-      console.log('user:', user);
       res.render('info', { data: user });
     } catch (err) {
       res.render('info', { data: err });
@@ -169,27 +168,30 @@ module.exports = (issuer) => {
       });
     }
 
+    const resp = {};
     const token = await getAppAccessToken(
       'user.reset-password',
       OAUTH_ACCESS_TOKEN,
     );
     try {
       const url = resolve(ORG_GATEWAY_URL, '/v1/users/reset-password');
-      const res = await fetch(url, {
-        body: JSON.stringify({
-          email: email,
-          userName: username,
-        }),
+      const req = await fetch(url, {
+        body: JSON.stringify({ email, userName: username }),
         headers: {
           Authorization: 'Bearer ' + token.access_token,
           'Content-Type': 'application/json',
         },
         method: 'POST',
       });
+      if (!(resp.success = req.ok)) {
+        resp.problem = true;
+        throw `${req.status}: ${req.statusText}`;
+      }
     } catch (err) {
-      res.render('signin/forgot-password', { err: err, username, email });
+      res.render('signin/forgot-password', { resp, err, username, email });
+      return;
     }
-    res.render('signin/non-hosted');
+    res.render('signin/forgot-password', { resp });
   }
 
   async function recoverUsernameHandler(req, res) {
@@ -206,15 +208,16 @@ module.exports = (issuer) => {
       });
     }
 
+    const resp = {};
     const token = await getAppAccessToken(
       'user.recover-username',
       OAUTH_ACCESS_TOKEN,
     );
     try {
       const url = resolve(ORG_GATEWAY_URL, '/v1/users/recover-username');
-      const res = await fetch(url, {
+      const req = await fetch(url, {
         body: JSON.stringify({
-          email: email,
+          email,
         }),
         headers: {
           Authorization: 'Bearer ' + token.access_token,
@@ -222,10 +225,15 @@ module.exports = (issuer) => {
         },
         method: 'POST',
       });
+      if (!(resp.success = req.ok)) {
+        resp.problem = true;
+        throw `${req.status}: ${req.statusText}`;
+      }
     } catch (err) {
-      res.render('signin/recover-username', { err: err, email });
+      res.render('signin/recover-username', { resp, err, email });
+      return;
     }
-    res.render('signin/recover-username');
+    res.render('signin/recover-username', { resp });
   }
 
   function hostedSigninHandler(req, res) {

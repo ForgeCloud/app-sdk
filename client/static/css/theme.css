@@ -72,6 +72,11 @@ label {
   text-transform: uppercase;
 }
 
+.alert {
+  font-size: 1.6em;
+  text-align: center;
+}
+
 .logo {
   max-height: 200px;
   max-width: 100%;

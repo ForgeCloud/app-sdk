@@ -18,6 +18,11 @@
   </fieldset>
   <button type="submit">Recover my username</button>
 </form>
+{{#if success}}
+<p class="alert alert-info">Check your email to retrieve your username</p>
+{{else if resp.problem}}
+<p class="alert alert-danger">There was a problem recovering your username</p>
+{{/if}}
 <footer>
   <p>
     <span
