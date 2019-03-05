@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-const ParseResponse = require('./parse-response');
+const parseResponse = require('./parse-response');
 const {
   CALLBACK_HOSTED,
   CALLBACK_NON_HOSTED,
@@ -41,7 +41,7 @@ module.exports = (oidcClient) => {
         Cookie: `iPlanetDirectoryPro=${tokenId};`,
       },
     })
-      .then(ParseResponse)
+      .then(parseResponse)
       .then(({ payload }) => payload)
       .catch((err) => {
         console.log('authorize err:', err);
