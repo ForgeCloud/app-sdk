@@ -78,12 +78,12 @@ curl -X POST \
 
 | Environment Variable | Default                                     |
 | -------------------- | ------------------------------------------- |
+| CLIENT_ID            | None                                        |
+| CLIENT_SECRET        | None                                        |
 | ORG_GATEWAY_URL      | http://localhost:8086                       |
 | HOST                 | app.example.com                             |
 | OAUTH_ISSUER         | https://openam-example.com/oauth2           |
 | OAUTH_SCOPES         | openid profile api.forgecloud.com:user.read |
-| OAUTH_KEY            | None                                        |
-| OAUTH_SECRET         | None                                        |
 
 ## Troubleshooting
 

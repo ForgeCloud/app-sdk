@@ -1,10 +1,10 @@
 const {
+  CLIENT_ID,
+  CLIENT_SECRET,
   ORG_GATEWAY_URL = 'http://localhost:8086',
   HOST = 'app.example.com',
   OAUTH_ISSUER = 'https://openam-example.com/oauth2',
-  OAUTH_KEY,
   OAUTH_SCOPES = 'openid',
-  OAUTH_SECRET,
   PORT = 9080,
   PROTOCOL = 'http',
   TENANT = '',
@@ -16,15 +16,15 @@ const CALLBACK_NON_HOSTED = `${BASE_URL}/callback/non-hosted`;
 const OPEN_AM = `https://openam-${TENANT}.forgeblocks.com`;
 
 module.exports = {
+  CLIENT_ID,
+  CLIENT_SECRET,
   BASE_URL,
   CALLBACK_HOSTED,
   CALLBACK_NON_HOSTED,
   ORG_GATEWAY_URL,
   HOST,
   OAUTH_ISSUER,
-  OAUTH_KEY,
   OAUTH_SCOPES,
-  OAUTH_SECRET,
   OPEN_AM,
   PORT,
   PROTOCOL,

@@ -1,11 +1,12 @@
 'use strict';
 
-const authenticate = require('./lib/authenticate');
-
+const { authenticate, getAppAccessToken } = require('./lib/authenticate');
 const {
   BASE_URL,
   CALLBACK_HOSTED,
   CALLBACK_NON_HOSTED,
+  CLIENT_ID,
+  CLIENT_SECRET,
   ORG_GATEWAY_URL,
 } = require('./config');
 
@@ -45,12 +46,16 @@ module.exports = (issuer) => {
   app.get('/', indexPage);
   app.get('/signin', signinPage);
   app.get('/signin-non-hosted', nonHostedSigninPage);
+  app.get('/forgot-password', forgotPasswordPage);
+  app.get('/recover-username', recoverUsernamePage);
 
   app.get('/callback', hostedCallbackHandler);
   app.get('/callback/non-hosted', nonHostedCallbackHandler);
   app.get('/logout', logoutHandler);
   app.post('/signin-hosted', hostedSigninHandler);
   app.post('/signin-non-hosted', nonHostedSigningHandler);
+  app.post('/forgot-password', forgotPasswordHandler);
+  app.post('/recover-username', recoverUsernameHandler);
 
   async function indexPage(req, res) {
     if (!req.session.accessToken) {
@@ -58,7 +63,6 @@ module.exports = (issuer) => {
     }
     try {
       let user = await getUserInfo(req.session.accessToken);
-      console.log('user:', user);
       res.render('info', { data: user });
     } catch (err) {
       res.render('info', { data: err });
@@ -75,6 +79,14 @@ module.exports = (issuer) => {
 
   function signinPage(req, res) {
     res.render('signin/index', {});
+  }
+
+  function forgotPasswordPage(req, res) {
+    res.render('signin/forgot-password', {});
+  }
+
+  function recoverUsernamePage(req, res) {
+    res.render('signin/recover-username', {});
   }
 
   async function hostedCallbackHandler(req, res) {
@@ -104,21 +116,21 @@ module.exports = (issuer) => {
   }
 
   async function nonHostedSigningHandler(req, res) {
-    let { password, username } = req.body;
-    username = typeof username == 'string' ? username.trim() : undefined;
-    password = typeof password == 'string' ? password.trim() : undefined;
-    if (!username || !password) {
-      return res.render('signin/non-hosted', {
-        err: {
-          status: 400,
-          reason: 'Bad Request',
-          help: 'username & password are required',
-        },
-        username,
-        password,
-      });
-    }
     try {
+      let { password, username } = req.body;
+      username = typeof username == 'string' ? username.trim() : undefined;
+      password = typeof password == 'string' ? password.trim() : undefined;
+      if (!username || !password) {
+        return res.render('signin/non-hosted', {
+          err: {
+            status: 400,
+            reason: 'Bad Request',
+            help: 'username & password are required',
+          },
+          username,
+          password,
+        });
+      }
       const { tokenId } = await authenticate(username, password);
       const authPayload = await authorize.nonHosted(tokenId);
       const { access_token, id_token } = await authorize.callback(
@@ -127,7 +139,6 @@ module.exports = (issuer) => {
       );
       setTokensAndRedirect(req, res, access_token, id_token);
     } catch (err) {
-      // res.status(err.status || 500).json(err);
       switch (err.reason) {
         case 'Bad Request':
           err.help = 'Ensure your login redirect urls are configured properly';
@@ -136,6 +147,80 @@ module.exports = (issuer) => {
           break;
       }
       res.render('signin/non-hosted', { err: err, username, password });
+    }
+  }
+
+  async function forgotPasswordHandler(req, res) {
+    let { username, email } = req.body;
+    try {
+      username = typeof username == 'string' ? username.trim() : undefined;
+      email = typeof email == 'string' ? email.trim() : undefined;
+      if (!username || !email) {
+        throw `${req.status}: Bad Request, username &amp; email required`;
+      }
+
+      const resp = {};
+      const token = await getAppAccessToken('user.reset-password');
+      console.log('token', token);
+      const url = resolve(ORG_GATEWAY_URL, '/v1/users/reset-password');
+      const req = await fetch(url, {
+        body: JSON.stringify({ email, userName: username }),
+        headers: {
+          Authorization: 'Bearer ' + token.access_token,
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+      if (!(resp.success = req.ok)) {
+        throw `${req.status}: ${req.statusText}`;
+      }
+      res.render('signin/forgot-password', { resp });
+    } catch (err) {
+      const resp = { problem: true };
+      res.render('signin/forgot-password', {
+        resp,
+        err,
+        userName: username,
+        email,
+      });
+    }
+  }
+
+  async function recoverUsernameHandler(req, res) {
+    let { email } = req.body;
+    try {
+      email = typeof email == 'string' ? email.trim() : undefined;
+      if (!email) {
+        return res.render('signin/recover-username', {
+          err: {
+            status: 400,
+            reason: 'Bad Request',
+            help: 'email is required',
+          },
+          email,
+        });
+      }
+
+      const resp = {};
+      const token = await getAppAccessToken('user.recover-username');
+      const url = resolve(ORG_GATEWAY_URL, '/v1/users/recover-username');
+      const req = await fetch(url, {
+        body: JSON.stringify({
+          email,
+        }),
+        headers: {
+          Authorization: 'Bearer ' + token.access_token,
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+      if (!(resp.success = req.ok)) {
+        throw `${req.status}: ${req.statusText}`;
+      }
+      res.render('signin/recover-username', { resp });
+    } catch (err) {
+      const resp = { problem: true };
+      res.render('signin/recover-username', { resp, err, email });
     }
   }
 

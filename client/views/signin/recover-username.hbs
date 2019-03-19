@@ -1,0 +1,40 @@
+{{> logo}}
+<header>
+  <h1 class="text-center">Recover Username</h1>
+</header>
+
+<form method="post" action="/recover-username">
+  <fieldset>
+    <label>Email</label>
+    <input
+      name="email"
+      type="text"
+      pattern=".{1,}"
+      class="input-text fullwidth"
+      value="{{email}}"
+      placeholder=""
+      required
+    />
+  </fieldset>
+  <button type="submit">Recover my username</button>
+</form>
+{{#if resp.success}}
+<p class="alert alert-info">Check your email to retrieve your username</p>
+{{else if resp.problem}}
+<p class="alert alert-danger">There was a problem recovering your username</p>
+{{/if}}
+<footer>
+  <p>
+    <span
+      >Already have an account?
+      <a id="sign-in" href="signin-non-hosted">Sign in</a></span
+    >
+  </p>
+  <p>
+    <span
+      >Forgot password?
+      <a id="forgot-password" href="forgot-password">Retrieve it here</a></span
+    >
+  </p>
+</footer>
+<br />
