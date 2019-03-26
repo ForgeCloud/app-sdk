@@ -5,9 +5,8 @@ const {
   BASE_URL,
   CALLBACK_HOSTED,
   CALLBACK_NON_HOSTED,
-  CLIENT_ID,
-  CLIENT_SECRET,
   ORG_GATEWAY_URL,
+  PORT,
 } = require('./config');
 
 module.exports = (issuer) => {
@@ -47,14 +46,15 @@ module.exports = (issuer) => {
   app.get('/signin', signinPage);
   app.get('/signin-non-hosted', nonHostedSigninPage);
   app.get('/forgot-password', forgotPasswordPage);
+  app.get('/reset-password', resetPasswordPage);
   app.get('/recover-username', recoverUsernamePage);
-
   app.get('/callback', hostedCallbackHandler);
   app.get('/callback/non-hosted', nonHostedCallbackHandler);
   app.get('/logout', logoutHandler);
   app.post('/signin-hosted', hostedSigninHandler);
   app.post('/signin-non-hosted', nonHostedSigningHandler);
   app.post('/forgot-password', forgotPasswordHandler);
+  app.post('/reset-password', resetPasswordHandler);
   app.post('/recover-username', recoverUsernameHandler);
 
   async function indexPage(req, res) {
@@ -83,6 +83,15 @@ module.exports = (issuer) => {
 
   function forgotPasswordPage(req, res) {
     res.render('signin/forgot-password', {});
+  }
+
+  function resetPasswordPage(req, res) {
+    const data = {};
+    const { token } = req.query;
+    if (!token) {
+      data.failure = 'Token required';
+    }
+    res.render('signin/reset-password', data);
   }
 
   function recoverUsernamePage(req, res) {
@@ -156,33 +165,72 @@ module.exports = (issuer) => {
       username = typeof username == 'string' ? username.trim() : undefined;
       email = typeof email == 'string' ? email.trim() : undefined;
       if (!username || !email) {
-        throw `${req.status}: Bad Request, username &amp; email required`;
+        throw new Error(
+          `${req.status}: Bad Request, username &amp; email required`,
+        );
       }
 
       const resp = {};
+      const destinationUrl = `http://localhost:${PORT}/reset-password`;
       const token = await getAppAccessToken('user.reset-password');
       console.log('token', token);
+
       const url = resolve(ORG_GATEWAY_URL, '/v1/users/reset-password');
       const req = await fetch(url, {
-        body: JSON.stringify({ email, userName: username }),
+        body: JSON.stringify({ destinationUrl, email, userName: username }),
         headers: {
-          Authorization: 'Bearer ' + token.access_token,
+          Authorization: `Bearer ${token.access_token}`,
           'Content-Type': 'application/json',
         },
         method: 'POST',
       });
       if (!(resp.success = req.ok)) {
-        throw `${req.status}: ${req.statusText}`;
+        throw new Error(`${req.status}: ${req.statusText}`);
       }
       res.render('signin/forgot-password', { resp });
     } catch (err) {
-      const resp = { problem: true };
+      console.log(err);
       res.render('signin/forgot-password', {
-        resp,
+        resp: { problem: true },
         err,
         userName: username,
         email,
       });
+    }
+  }
+
+  async function resetPasswordHandler(req, res) {
+    try {
+      const { token } = req.query;
+      if (!token) {
+        throw new Error('Token required');
+      }
+
+      let { password } = req.body;
+      password = typeof password == 'string' ? password.trim() : undefined;
+      if (!password) {
+        throw new Error('Password required');
+      }
+
+      const accessTokenRes = await getAppAccessToken('user.reset-password');
+      console.log('accessTokenRes', accessTokenRes);
+
+      const url = resolve(ORG_GATEWAY_URL, `/v1/users/reset-password/${token}`);
+      const response = await fetch(url, {
+        body: JSON.stringify({ password }),
+        headers: {
+          Authorization: `Bearer ${accessTokenRes.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+
+      res.render('signin/reset-password', { success: true });
+    } catch (err) {
+      res.render('signin/reset-password', { failure: err.message });
     }
   }
 
