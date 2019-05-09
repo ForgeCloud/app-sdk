@@ -17,7 +17,10 @@ Now install dependencies and run this sample application:
 
 ```bash
 npm i
-sh start.sh {tenant name} {client id} {secret}
+sh start.sh {tenant name} {client id} {secret} {id token signing alg}
+
+# Example
+sh start.sh pebble-bank e93410c06d2b35813316f235f8ab015e THJ/jHzaXVA1THKyIZQ9JRKA0YGzFYK2t5n//usAb/4= RS256
 ```
 
 ## Optional Docker Setup
