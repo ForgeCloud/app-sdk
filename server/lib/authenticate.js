@@ -28,7 +28,7 @@ function authenticate(username, password) {
 
 function getAppAccessToken(scope) {
   const clientCredentials = btoa(`${CLIENT_ID}:${CLIENT_SECRET}`);
-  const host = OPEN_AM.split('//')[1];
+  const host = OPEN_AM.split("//")[1].split("/")[0];
   const params = new URLSearchParams();
   params.append('grant_type', 'client_credentials');
   params.append('scope', scope);

@@ -14,7 +14,7 @@ const {
 const BASE_URL = `${PROTOCOL}://${HOST}${PORT == 80 ? '' : `:${PORT}`}`;
 const CALLBACK_HOSTED = `${BASE_URL}/callback`;
 const CALLBACK_NON_HOSTED = `${BASE_URL}/callback/non-hosted`;
-const OPEN_AM = `https://openam-${TENANT}.forgeblocks.com`;
+const OPEN_AM = `https://openam-${TENANT}.forgeblocks.com/am`;
 
 module.exports = {
   BASE_URL,
