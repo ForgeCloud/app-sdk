@@ -172,10 +172,10 @@ module.exports = (issuer) => {
 
       const resp = {};
       const destinationUrl = `http://localhost:${PORT}/reset-password`;
-      const token = await getAppAccessToken('user.reset-password');
+      const token = await getAppAccessToken('selfservice.reset-password');
       console.log('token', token);
 
-      const url = resolve(ORG_GATEWAY_URL, '/v1/users/reset-password');
+      const url = resolve(ORG_GATEWAY_URL, '/v1/selfservice/reset-password');
       const req = await fetch(url, {
         body: JSON.stringify({ destinationUrl, email, userName: username }),
         headers: {
@@ -212,10 +212,10 @@ module.exports = (issuer) => {
         throw new Error('Password required');
       }
 
-      const accessTokenRes = await getAppAccessToken('user.reset-password');
+      const accessTokenRes = await getAppAccessToken('selfservice.reset-password');
       console.log('accessTokenRes', accessTokenRes);
 
-      const url = resolve(ORG_GATEWAY_URL, `/v1/users/reset-password/${token}`);
+      const url = resolve(ORG_GATEWAY_URL, `/v1/selfservice/reset-password/${token}`);
       const response = await fetch(url, {
         body: JSON.stringify({ password }),
         headers: {
@@ -250,8 +250,8 @@ module.exports = (issuer) => {
       }
 
       const resp = {};
-      const token = await getAppAccessToken('user.recover-username');
-      const url = resolve(ORG_GATEWAY_URL, '/v1/users/recover-username');
+      const token = await getAppAccessToken('selfservice.recover-username');
+      const url = resolve(ORG_GATEWAY_URL, '/v1/selfservice/recover-username');
       const req = await fetch(url, {
         body: JSON.stringify({
           email,
