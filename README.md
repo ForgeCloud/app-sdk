@@ -41,7 +41,7 @@ docker-compose up
 
 ## Hosted vs Non-Hosted Sign In
 
-Use the hosted-signin flow for redirecting users to a hosted webpage where credentials are entered for an oauth code which your app exchanges for the `access_token`. In the non-hosted flow _you_ collect user credentials within your app interface without redirection, submit to our REST endpoint `/authenticate` for the user's `id_token`, and complete the oauth steps using additional params `id_token=<USER_ID_TOKEN>` `decision=allow` as well as an your openam cookie `iPlanetDirectoryPro=<USER_ID_TOKEN>` during the authorize step.
+Use the hosted-signin flow for redirecting users to a hosted webpage where credentials are entered for an oauth code which your app exchanges for the `access_token`. In the non-hosted flow _you_ collect user credentials within your app interface without redirection, submit to our REST endpoint `/authenticate` for the user's `id_token`, and complete the oauth steps using additional params `id_token=<USER_ID_TOKEN>` `decision=allow` as well as an your AM cookie `iPlanetDirectoryPro=<USER_ID_TOKEN>` during the authorize step.
 
 HTTP /authenticate example
 
@@ -72,7 +72,7 @@ curl -X POST \
 {
     "code": "rgH$6sWUe81nFD$4hudYiMifQ",
     "scope": "profile",
-    "iss": "https://openam-<YOUR_TENANT>.forgeblocks.com/oauth2",
+    "iss": "https://am-<YOUR_TENANT>.forgeblocks.com/oauth2",
     "client_id": "<YOUR_CLIENT_ID>"
 }
 ```
@@ -85,7 +85,7 @@ curl -X POST \
 | CLIENT_SECRET        | None                                        |
 | ORG_GATEWAY_URL      | http://localhost:8086                       |
 | HOST                 | app.example.com                             |
-| OAUTH_ISSUER         | https://openam-example.com/oauth2           |
+| OAUTH_ISSUER         | https://am-example.com/oauth2           |
 | OAUTH_SCOPES         | openid profile api.forgecloud.com:user.read |
 
 ## Troubleshooting
