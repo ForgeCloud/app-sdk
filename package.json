@@ -14,7 +14,7 @@
     "express": "^4.16.3",
     "express-handlebars": "^3.1.0",
     "express-session": "^1.15.6",
-    "node-fetch": "^2.3.0",
+    "node-fetch": "^2.6.1",
     "openid-client": "^2.5.0"
   }
 }
